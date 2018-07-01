@@ -50,7 +50,7 @@ $$
 $$
 L_\pi(\tilde{\pi}) = \eta(\pi) + \sum_s \rho_{\pi}(s) \sum_a \tilde{\pi}(a|s) A_\pi(s,a)
 $$
-注意到 $L_\pi$ 使用了访问频次 $\rho_\pi$ 而不是 $\rho_{\tilde{\pi}}$ ， 因为如果我们使用参数化的策略，并且 $\pi_\theta(a|s)$ 是可导的，那么新策略与旧策略的参数非常接近时，这种近似是合理的，同时 $L_\pi$ 与 $\eta$ 一阶近似，也就是对于任意参数 $\theta_0$ ，都有：
+注意到 $L_\pi$ 使用了访问频次 $\rho_\pi$ 而不是 $\rho_{\tilde{\pi}}$ ，因为如果我们使用参数化的策略，并且 $\pi_\theta(a|s)$ 是可导的，那么新策略与旧策略的参数非常接近时，这种近似是合理的，同时 $L_\pi$ 与 $\eta$ 一阶近似，也就是对于任意参数 $\theta_0$ ，都有：
 $$
 L_{\pi_{\theta_0}}(\pi_{\theta_0}) = \eta(\pi_{\theta_0})\\
 \nabla_\theta L_{\pi_{\theta_0}}(\pi_{\theta}) | _{\theta=\theta_0} = \nabla_\theta \eta(\pi_\theta) | _{\theta=\theta_0}
