@@ -87,13 +87,13 @@ $$
 
 之前的小节提出了 $\eta(\theta) \ge L_{\theta_{old}} - CD_{KL}^{\max}(\theta_{old},\theta)$ ，当 $\theta = \theta_{old}$ 时取等号。因此，只要最大化下面的公式，就能保证往好的方向改进总回报：
 $$
-\max_\theta[L_{\theta_{old}}(\theta) - CD_{KL}^{\max}(\theta_{old},\theta)]
+\underset{\theta}{\text{maximize}} \quad [L_{\theta_{old}}(\theta) - CD_{KL}^{\max}(\theta_{old},\theta)]
 $$
 在实际中，如果我们使用上面理论中提到的惩罚 $C$ ，那么步长会变得很小。一种解决方法是约束新旧策略之间的 KL 散度，也就是置信域约束 (trust region constraint) ：
 $$
 \begin{align*}
-&\max_\theta L_{\theta_{old}}(\theta)\\
-&\text{subject to }D_{KL}^{\max}(\theta_{old},\theta) \le \delta
+\underset{\theta}{\text{maximize }} \quad &L_{\theta_{old}}(\theta)\\
+\text{subject to } \quad &D_{KL}^{\max}(\theta_{old},\theta) \le \delta
 \end{align*}
 $$
 但这种方法并不能应用到实际中，因为状态空间可能会非常大，比如连续状态，导致会有非常多的约束，所以我们使用启发式的近似方法——平均 KL 散度：
@@ -103,8 +103,8 @@ $$
 因此，我们通过解决以下优化问题来进行策略更新:
 $$
 \begin{align*}
-&\max_\theta L_{\theta_{old}}(\theta)\\
-&\text{subject to } \bar{D}_{KL}^{\rho_{\theta{old}}}(\theta_{old},\theta) \le \delta
+\underset{\theta}{\text{maximize}} \quad &L_{\theta_{old}}(\theta)\\
+\text{subject to} \quad &\bar{D}_{KL}^{\rho_{\theta{old}}}(\theta_{old},\theta) \le \delta
 \end{align*} \tag{4}
 $$
 
@@ -115,8 +115,8 @@ $$
 我们先将 公式 (4) 中的 $L_{\theta_{old}}(\theta)$ 展开来表示：
 $$
 \begin{align*}
-&\max_\theta \sum_s \rho_{\theta_{old}}(s) \sum_a \pi_\theta(a|s) A_{\theta_{old}}(s,a) \\
-&\text{subject to } \bar{D}_{KL}^{\rho_{\theta{old}}}(\theta_{old},\theta) \le \delta
+\underset{\theta}{\text{maximize}} \quad &\sum_s \rho_{\theta_{old}}(s) \sum_a \pi_\theta(a|s) A_{\theta_{old}}(s,a) \\
+\text{subject to} \quad &\bar{D}_{KL}^{\rho_{\theta{old}}}(\theta_{old},\theta) \le \delta
 \end{align*} \tag{5}
 $$
 首先用 $\frac{1}{1-\gamma}\mathbb{E}_{s\sim\rho_{\theta_{old}}}[\cdots]$ 来代替 $\sum_s \rho_{\theta_{old}}(s)$ ；接着用行为价值函数 $Q_{\theta_{old}}$ 代替优势函数 $A_{\theta_{old}}$ ，因为这只改变了一个常数项；最后我们用重要性采样来代替对行为的求和，用 $q$ 来表示采样的概率分布，则对于某一个状态 $s_n$ 的损失函数为：
@@ -126,8 +126,8 @@ $$
 综上三点，公式 (5) 与可以写成下列的期望形式：
 $$
 \begin{align*}
-& \max_{\theta}E_{s\sim \rho_{\theta_{old}}, a\sim q}\left[ \frac{\pi_\theta(a|s)}{q(a|s)}Q_{\theta_{old}}(s,a) \right] \\
-&\text{subject to }  E_{s\sim \rho_{\theta_{old}}}[D_{KL}( \pi_{\theta_{old}}(\cdot | s) \ \|\  \pi_{\theta}(\cdot | s) )] \le \delta
+\underset{\theta}{\text{maximize}} \quad &E_{s\sim \rho_{\theta_{old}}, a\sim q}\left[ \frac{\pi_\theta(a|s)}{q(a|s)}Q_{\theta_{old}}(s,a) \right] \\
+\text{subject to} \quad  &E_{s\sim \rho_{\theta_{old}}}[D_{KL}( \pi_{\theta_{old}}(\cdot | s) \ \|\  \pi_{\theta}(\cdot | s) )] \le \delta
 \end{align*} \tag{6}
 $$
 最终的算法可以分为以下三个部分：

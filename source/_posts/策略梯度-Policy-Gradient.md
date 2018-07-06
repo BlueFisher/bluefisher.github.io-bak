@@ -35,7 +35,7 @@ $$
 &= \pi_\theta(s,a)  \nabla_\theta \log\pi_\theta(s,a) 
 \end{align*}
 $$
-其中 $\log\pi_\theta(s,a) $ 叫做 Score Function 。
+其中 $\log\pi_\theta(s,a)$ 叫做 Score Function 。
 
 对于离散动作，可以用 Softmax Policy：
 $$
