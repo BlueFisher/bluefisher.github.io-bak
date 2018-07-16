@@ -71,7 +71,7 @@ L_i(\theta_i) = \mathbb{E}_{s,a,r}\left[ (y_i-Q(s,a; \theta_i)^2 \right]
 $$
 其中 $y_i=\mathbb{E}_{s'}[r+\gamma\max_{a'}Q(s',a';\theta_{i-1})]$，所以对于参数 $\theta_i$ 的梯度为：
 $$
-\nabla_{\theta_i}L_i(\theta_i)=\mathbb{E}_{s,a,r,s'} \left[ \left(r+\gamma\max_{a'}Q(s',a';\theta_{i-1})\right) \nabla_{\theta_i}Q(s,a;\theta_i)  \right]
+\nabla_{\theta_i}L_i(\theta_i)=\mathbb{E}_{s,a,r,s'} \left[ \left(r+\gamma\max_{a'}Q(s',a';\theta_{i-1}) -Q(s,a;\theta_i) \right) \nabla_{\theta_i}Q(s,a;\theta_i)  \right]
 $$
 
 ## 经验回放 Experience Replay
@@ -84,7 +84,7 @@ $$
 
 ## 目标神经网络 Target Network
 
-为了更进一步增强运用了神经网络的 Q-Learning 方法的稳定性，第二篇论文中提出了用一个分离的神经网络来生成目标 $y_i$ ，成为目标网络 (target network)。在经过 $C$ 趟训练之后，将原有更新过后的网络 $Q$ 的参数复制给目标网络 $\hat Q$ ，修改后的伪代码为：
+为了更进一步增强运用了神经网络的 Q-Learning 方法的稳定性，第二篇论文中提出了用一个分离的神经网络 $\hat{Q}$ 来生成目标 $y_i$ ，成为目标网络 (target network)。在每一次的迭代过程中，将 $r+\gamma\max_{a'} Q^*(s',a')$ 用旧参数 $\theta^-$固定下来 $r+\gamma\max_{a'} \hat{Q}(s',a';\theta_i^-)$ ，经过 $C$ 趟训练之后，将原有更新过后的网络 $Q$ 的参数复制给目标网络 $\hat Q$ ，修改后的伪代码为：
 
 ![](https://s1.ax1x.com/2018/05/18/C6ypxs.png) 
 
