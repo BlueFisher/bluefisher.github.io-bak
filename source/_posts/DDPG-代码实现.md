@@ -1,6 +1,6 @@
 ---
 title: DDPG 代码实现
-mathjax: false
+mathjax: true
 date: 2018-05-17 00:00:01
 updated: 2018-05-17 00:00:01
 categories:
@@ -71,7 +71,7 @@ class Memory(object):
 
 # Critic
 
-critic 相对简单一点，与 DQN 算法基本相同，目标是最小化 $\mathbb{E}\left[ ( Q(s_t,a_t|\theta^Q) - y_t )^2 \right]$ ，在最小化时，可以阻断也可以不阻断 $y_t$ 处的梯度，效果都差不多。
+critic 相对简单一点，与 DQN 算法基本相同，目标是最小化 $\mathbb{E}\left[ ( Q(s_t,a_t|\theta^Q) - y_t )^2 \right]​$ ，在最小化时，可以阻断也可以不阻断 $y_t​$ 处的梯度，效果都差不多。
 
 ```python
 class Critic(object):

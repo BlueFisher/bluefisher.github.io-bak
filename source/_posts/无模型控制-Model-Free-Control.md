@@ -2,7 +2,7 @@
 title: 无模型控制 Model-Free Control
 mathjax: true
 date: 2018-05-22
-updated: 2018-05-22
+updated: 2018-07-20
 categories:
 - Reinforcement Learning
 - Course by David Silver
@@ -179,6 +179,18 @@ $$
 
 ![](https://s1.ax1x.com/2018/05/22/CRFdpR.png)
 
+那为什么 Q-Learning 是异策略但不需要重要性采样呢？Quora 上有人给出了答案，我们可以看一下行为价值函数的贝尔曼最优方程：
+$$
+Q(s,a) = R(s,a) + \gamma\sum_{s'}\mathcal{P_{ss'}^a} \max_{a'}Q(s',a')
+$$
+其中 $\mathcal{P_{ss'}^a}$ 是状态转移概率，而这里其实就是根据环境的状态转移概率分布来去求后一个状态最大的行为值函数的期望：
+$$
+Q(s,a) = R(s,a) + \gamma \mathbb{E}_{s'\sim \mathcal{P_{ss'}^a}} \max_{a'}Q(s',a')
+$$
+但贝尔曼方程的问题在于，现在的强化学习是无模型的，我们不知道状态转移概率是什么，但我们可以进行采样。回到 Q-Learning ，我们只是使用值迭代的方法，从任意的 $Q$ 值开始，不断应用贝尔曼方程，但这时候我们不是用根据状态转移概率来计算期望值，而是直接从环境进行采样，使用估计的期望值。
+
+所以，这里的重要性采样是根据环境的状态转移概率分布而来，不是策略分布，所以我们不需要用重要性采样来对另一个策略分布进行修正。
+
 # 动态规划与时间差分的比较
 
 ![](https://s1.ax1x.com/2018/05/22/CRF2hd.png)
@@ -190,3 +202,5 @@ Sutton, R. S., & Barto, A. G. (1998). *Reinforcement learning: An introduction* 
 <http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/control.pdf>
 
 <https://zhuanlan.zhihu.com/p/28108498>
+
+https://www.quora.com/Why-doesn-t-DQN-use-importance-sampling-Dont-we-always-use-this-method-to-correct-the-sampling-error-produced-by-the-off-policy

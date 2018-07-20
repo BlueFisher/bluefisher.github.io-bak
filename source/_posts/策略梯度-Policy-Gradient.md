@@ -2,7 +2,7 @@
 title: 策略梯度 Policy Gradient
 mathjax: true
 date: 2018-05-10 14:31:48
-updated: 2018-05-10 14:31:48
+updated: 2018-07-18 20:25:50
 categories:
 - Reinforcement Learning
 - Course by David Silver
@@ -11,22 +11,35 @@ tags:
 - PG
 ---
 
-之前的所有方法都是基于值函数、行为价值函数，求出 $V^\pi(s)$ 或 $Q^\pi(s,a)$ 或是他们的近似函数来映射出最优策略。而基于策略的强化学习方法 (Policy-Based Reinforcement Learning) 则直接将策略参数化，即 $\pi_\theta(s,a)=\mathbb{P}[a|s,\theta]$ ，利用参数化的线性、非线性函数来表示策略，寻找最优策略，而这个最优策略的搜索即是要将下列期望函数最大化：
-$$
-\begin{align*}
-J(\theta) &= V^{\pi_\theta}(s_1) \\
-&= \sum_s d^{\pi_\theta}(s) V^{\pi_\theta}(s)\\
-&= \sum_s d^{\pi_\theta}(s) \sum_a \pi_\theta(s,a) \mathcal{R}_s^a \\
-&= \mathbb{E}_{s \sim d^\pi, a \sim \pi_\theta} [\mathcal{R}_s^a]
-\end{align*}
-$$
-其中 $d^{\pi_\theta}(s)=\sum_{s' \in \mathcal{S}} d^{\pi_\theta} (s') \mathcal{P}_{s's}$ 是基于策略 $\pi_\theta$ 的状态的静态分布。
+之前的所有方法都是基于值函数、行为价值函数，求出 $V^\pi(s)$ 或 $Q^\pi(s,a)$ 或是他们的近似函数来映射出最优策略。而基于策略的强化学习方法 (Policy-Based Reinforcement Learning) 则直接将策略参数化，即 $\pi_\theta(s,a)=\mathbb{P}[a|s,\theta]$ ，利用参数化的线性、非线性函数来表示策略，寻找最优策略，而这个最优策略的搜索即是要将某个目标函数最大化。
 
 <!--more-->
 
 # Policy Gradient
 
-为了将上述函数最大化，则很显然要使用梯度下降的方法，即 $\Delta \theta = \alpha \nabla_\theta J(\theta)$ ，其中 $\nabla_\theta J(\theta)$ 即为策略梯度。
+## 策略目标函数 Policy Objective Functions
+
+1. Start Value ：在能够产生完整 episode 的环境下，也就是说 agent 可以达到某个终止状态时，我们可以用 start value 来衡量策略的优劣，就是初始状态 $s_1$ 的累计奖励：
+
+$$
+J_1(\theta) = V^{\pi_\theta}(s_1) = \mathbb{E}_{\pi_\theta}[v_1]
+$$
+
+2. Average Value ：在连续环境下，我们可以使用各状态的价值函数平均值：
+
+$$
+J_{avV}(\theta) = \sum_s d^{\pi_\theta}(s) V^{\pi_\theta}(s)
+$$
+
+3. Average Reward per Time-Step ：我们也可以使用每一时间步长下的平均奖励：
+
+$$
+J_{avR}(\theta) = \sum_s d^{\pi_\theta}(s)  \sum_a \pi_\theta(s,a)\mathcal{R}_s^a
+$$
+
+其中 $d^{\pi_\theta}(s)=\sum_{s' \in \mathcal{S}} d^{\pi_\theta} (s') \mathcal{P}_{s's}$ 是基于策略 $\pi_\theta$ 的状态的静态分布。
+
+## 似然比 Likelihood Ratios
 
 假设策略 $\pi_\theta$ 是可导的且不等于0，则似然比 (Likelihood ratios) 为：
 $$
@@ -47,17 +60,24 @@ $$
 a \sim \mathcal{N}(\mu(s), \sigma^2) \\
 \nabla_\theta \log \pi_\theta(s,a) = \frac{(a-\mu(s))\phi(s)}{\sigma^2}
 $$
-在多步MDP中，用Q值代替即时奖励：
+## 策略梯度定理 Policy Gradient Theorem
+
+先考虑一个非常简单的单步 (one-step) MDP 问题：初始状态 $s \sim d(s)$ ，只经历一步得到一个即时奖励 $r=\mathcal{R}_{s,a}$ 就终止。由于是单步 MDP ，所以三种目标函数都是一样的，我们用似然比来计算策略梯度：
 $$
 \begin{align*}
-\nabla_\theta J(\theta) 
-&= \sum_s d^{\pi_\theta}(s) \sum_a \pi_\theta(s,a)  \nabla_\theta \log\pi_\theta(s,a)  Q^{\pi_\theta}(s,a) \\
-&= \mathbb{E}_{\pi_\theta}[ \nabla_\theta \log\pi_\theta(s,a)  Q^{\pi_\theta}(s,a)]
+J(\theta) &= \mathbb{E}_{\pi_\theta}[r]\\
+&=  \sum_s d^{\pi_\theta}(s)  \sum_a \pi_\theta(s,a)\mathcal{R}_s^a \\
+\nabla_\theta J(\theta) &= \sum_s d(s) \sum_a \pi_\theta(s,a)  \nabla_\theta \log\pi_\theta(s,a)  \mathcal{R_{s,a}} \\
+&= \mathbb{E}_{\pi_\theta}[ \nabla_\theta \log\pi_\theta(s,a)  r]
 \end{align*}
 $$
-这样一来有了期望公式，就可以用蒙特卡罗采样的方法求出近似期望。
+如果是多步 (multi-step) MDP ，我们要用长时价值 $Q^\pi(s,a)$ 来代替即时奖励 $r$ ，并且有如下定理：对于 $J=J_1,\ J_{avR},\ \frac{1}{1-\gamma}J_{avV}$ 策略梯度都有：
+$$
+\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}[ \nabla_\theta \log\pi_\theta(s,a)  Q^{\pi_\theta}(s,a)]
+$$
+证明在 *Sutton, Richard S., et al. "Policy gradient methods for reinforcement learning with function approximation." Advances in neural information processing systems. 2000.* 这篇论文的附录中。
 
-用 $v_t$ 作为 $Q^{\pi_\theta}(s,a)$ 的无偏采样样本，则传统 REINFORCE 算法为：
+这样一来有了期望公式，就可以用蒙特卡罗采样的方法求出近似期望。用 $v_t$ 作为 $Q^{\pi_\theta}(s,a)$ 的无偏采样样本，则传统 REINFORCE 算法为：
 
 ![](https://s1.ax1x.com/2018/05/14/CrwW1f.png)
 

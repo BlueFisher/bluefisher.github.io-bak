@@ -2,7 +2,7 @@
 title: Deterministic Policy Gradient
 mathjax: true
 date: 2018-05-16 10:42:32
-updated: 2018-05-16 10:42:32
+updated: 2018-07-21 08:35:32
 categories:
 - Reinforcement Learning
 tags:
@@ -66,11 +66,13 @@ $$
 
 # 确定性策略梯度 Gradients of Deterministic Policies
 
-现在考虑确定性策略，即 $a=\mu_\theta(s)$ 。
+现在考虑确定性策略，即 $a=\mu_\theta(s)$ 。我们从两种角度来导出确定性策略梯度。
 
-## 行为价值函数的梯度
+## 行为价值函数的梯度 Action-Value Gradients
 
-策略梯度参数 $θ^{k+1}$ 根据行为价值函数的梯度方向 $\nabla_θ Q^{μ^k}(s,μ_θ(s))$ 来进行更新，即：
+绝大多数的无模型强化学习算法都是基于策略迭代，也就是策略评估 (policy evaluation) 和策略改善 (policy improvement) 两步。策略评估就是来估计行为价值函数 $Q^\pi(s,a)$ 或 $Q^\mu(s,a)$ ，比如用 MC 或 TD 来进行估计，然后再进行策略改善，最常用的方法是用贪婪法：$\mu^{k+1}(s)=\arg\max_a Q^{\mu^k}(s,a)$
+
+在连续行为空间中，策略改善环节的贪婪法就变得不可行了。我们可以做一点小的改变，就是让策略梯度参数 $θ^{k+1}$ 根据行为价值函数的梯度方向 $\nabla_θ Q^{μ^k}(s,μ_θ(s))$ 来进行更新，即：
 $$
 \theta^{k+1} = \theta^k + \alpha  \mathbb{E}_{s \sim \rho^{\mu^k}} \left[ \nabla_θ Q^{μ^k}(s,μ_θ(s)) \right]
 $$
@@ -79,7 +81,7 @@ $$
 \theta^{k+1} = \theta^k + \alpha  \mathbb{E}_{s \sim \rho^{\mu^k}} \left[ \nabla_θ \mu_\theta(s) \nabla_a Q^{\mu^k} (s,a)|_{a=\mu_\theta(s)} \right]
 $$
 
-## 确定性策略梯度
+## 确定性策略梯度定理 Deterministic Policy Gradient Theorem
 
 类比随机策略，因为此时是确定性的策略，所以不需要再对行为 $a$ 做积分求期望，则累计奖励期望为：
 $$
@@ -88,7 +90,7 @@ J(\mu_\theta) &= \int_\mathcal{S} \rho^\mu(s) r(s,\mu_\theta(s)) \mathrm{d}s \\
 &= \mathbb{E}_{s \sim \rho^\mu}[r(s,\mu_\theta(s))]
 \end{align*}
 $$
-则对于 $J$ 的梯度，即 DPG 为：
+与随即策略梯度相同，我们使用 $Q$ 值来代替即时奖励，则对于 $J$ 的梯度，即 DPG 为：
 $$
 \begin{align*}
 \nabla_\theta J(\mu_\theta) &= \int_\mathcal{S} \rho^\mu(s) \nabla_θ \mu_\theta(s) \nabla_a Q^{\mu} (s,a)|_{a=\mu_\theta(s)} \mathrm{d}s \\
@@ -96,6 +98,8 @@ $$
 \end{align*}
 $$
 可以发现，与随机策略梯度相比，DPG 少了对行为的积分，多了对行为价值函数的梯度，这也使得 DPG 需要更少的采样却能达到比随机策略梯度更好的效果。
+
+## 随机策略梯度的极限形式 Limit of the Stochastic Policy Gradient
 
 DPG 公式乍一看并不像随机策略梯度公式，但实际上 DPG 是随机策略梯度的一种特例形式。假设定义随机策略的参数为 $\pi_{\mu_\theta, \sigma}$ ，其中 $\sigma$ 为方差参数，也就是说，如果 $\sigma=0$ ，则随机策略等于确定性策略 $\pi_{\mu_\theta, \sigma} \equiv \mu_\theta$ ，所以可以得出策略梯度的极限形式：
 $$
