@@ -2,7 +2,6 @@
 title: Python Tricks
 mathjax: true
 date: 2018-05-12 10:08:29
-updated: 2018-06-19 15:00:30
 categories:
 - Python
 tags:
@@ -10,6 +9,7 @@ tags:
 - tricks
 ---
 
+- 拆箱
 - 使用 .(dot) 来访问字典成员
 - numpy 一维数组与二维数组相加
 - class 中的 self
@@ -21,6 +21,18 @@ tags:
 - *… 持续更新中*
 
 <!--more-->
+
+# 拆箱
+
+```python
+>>> a, *b, c = [1, 2, 3, 4, 5]
+>>> a
+1
+>>> b
+[2, 3, 4]
+>>> c
+5
+```
 
 # 使用 .(dot) 来访问字典成员
 

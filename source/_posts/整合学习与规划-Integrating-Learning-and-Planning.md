@@ -34,6 +34,7 @@ $$
 $$
 \mathbb{P}[S_{t+1},R_{t+1}|S_t,A_t] = \mathbb{P}[S_{t+1}|S_t,A_t] \mathbb{P}[R_{t+1}|S_t,A_t]
 $$
+
 ## 学习模型
 
 有了以上的定义，我们的目标就是以监督学习的方式，从经验 $\{S_1,A_1,R_2,\cdots,S_\text{T}\}$ 中学习模型 $\mathcal{M}_\eta$

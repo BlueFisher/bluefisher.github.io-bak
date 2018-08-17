@@ -2,7 +2,6 @@
 title: Deterministic Policy Gradient
 mathjax: true
 date: 2018-05-16 10:42:32
-updated: 2018-07-21 08:35:32
 categories:
 - Reinforcement Learning
 tags:
@@ -94,7 +93,8 @@ $$
 $$
 \begin{align*}
 \nabla_\theta J(\mu_\theta) &= \int_\mathcal{S} \rho^\mu(s) \nabla_θ \mu_\theta(s) \nabla_a Q^{\mu} (s,a)|_{a=\mu_\theta(s)} \mathrm{d}s \\
-&= \mathbb{E}_{s \sim \rho^\mu} \left[ \nabla_θ \mu_\theta(s) \nabla_a Q^{\mu} (s,a)|_{a=\mu_\theta(s)} \right]
+&= \mathbb{E}_{s \sim \rho^\mu} \left[ \nabla_θ \mu_\theta(s) \nabla_a Q^{\mu} (s,a)|_{a=\mu_\theta(s)} \right] \\
+&= \mathbb{E}_{s \sim \rho^\mu} \left[ \nabla_\theta Q^{\mu} (s,\mu_\theta(s)) \right]
 \end{align*}
 $$
 可以发现，与随机策略梯度相比，DPG 少了对行为的积分，多了对行为价值函数的梯度，这也使得 DPG 需要更少的采样却能达到比随机策略梯度更好的效果。

@@ -2,7 +2,6 @@
 title: 搭建shadowsocks服务器
 mathjax: false
 date: 2018-05-07 14:52:38
-updated: 2018-05-12 9:53:45
 categories:
 - Linux
 tags:
@@ -12,14 +11,14 @@ tags:
 # 安装shadowsocks
 
 ```bash
-sudo apt-get install python-pip
-sudo pip install shadowsocks
+sudo apt-get install python3-pip
+sudo pip3 install shadowsocks
 ```
 
-或
+若出现 `Command "[Python](https://link.jianshu.com/?t=http://lib.csdn.net/base/python) setup.py egg_info" failed with error code 1 in /tmp/pip-build-* ` 错误，则需要安装：
 
 ```bash
-sudo apt-get install shadowsocks
+sudo pip3 install setuptools
 ```
 
 新建shadowsocks配置文件shadowsocks.json ：
@@ -38,6 +37,22 @@ sudo apt-get install shadowsocks
 ```
 
  `PORT1` ，`PORT2` 为服务器监听的端口号，后面是客户端连接当前端口的密码
+
+开启服务器测试：
+
+```bash
+ssserver -c shadowsocks.json
+```
+
+如遇到 `AttributeError: /usr/lib/x86_64-Linux-gnu/libcrypto.so.1.1: undefined symbol: EVP_CIPHER_CTX_cleanup` 错误，则：
+
+打开文件 `/usr/local/lib/python3.6/dist-packages/shadowsocks/crypto/openssl.py` 
+
+将 `libcrypto.EVP_CIPHER_CTX_cleanup.argtypes = (c_void_p,)` 改为 `libcrypto.EVP_CIPHER_CTX_reset.argtypes = (c_void_p,)`
+
+将 `libcrypto.EVP_CIPHER_CTX_cleanup(self._ctx)` 改为 `libcrypto.EVP_CIPHER_CTX_reset(self._ctx)`
+
+重新启动 shadowsocks 即可。
 
 <!--more-->
 
@@ -111,7 +126,7 @@ sudo journalctl -u shadowsocks
 
 可能某些 VPS 的 google scholar ipv4 地址被 Google 封了，打开谷歌学术一直是 "We're sorry..." ，所以需要在服务器上开启 ipv6 来访问。
 
-安装 Miredo
+安装 Miredo ，若 VPS 已经设置了 IPV6 则不需要
 
 ```bash
 sudo apt install miredo

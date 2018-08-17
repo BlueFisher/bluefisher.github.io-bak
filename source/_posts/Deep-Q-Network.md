@@ -2,7 +2,6 @@
 title: Deep Q-Network
 mathjax: true
 date: 2018-05-07 21:22:01
-updated: 2018-05-22 21:22:01
 categories:
 - Reinforcement Learning
 tags:
@@ -67,7 +66,7 @@ J(w) = \mathbb{E}_\pi [(q_\pi(S,A) - \hat{q}(S,A,w))^2]
 $$
 而对于一个 Q-network，在论文中记为：
 $$
-L_i(\theta_i) = \mathbb{E}_{s,a,r}\left[ (y_i-Q(s,a; \theta_i)^2 \right]
+L_i(\theta_i) = \mathbb{E}_{s,a,r}\left[ \big(y_i-Q(s,a; \theta_i)\big)^2 \right]
 $$
 其中 $y_i=\mathbb{E}_{s'}[r+\gamma\max_{a'}Q(s',a';\theta_{i-1})]$，所以对于参数 $\theta_i$ 的梯度为：
 $$
