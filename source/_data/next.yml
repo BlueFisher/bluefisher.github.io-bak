@@ -479,7 +479,7 @@ baidu_analytics: 553ac1673540f93b43866b93cc2d3efe
 
 # Disqus
 disqus:
-  enable: false
+  enable: true
   shortname: fisher-blog
   count: true
   lazyload: true

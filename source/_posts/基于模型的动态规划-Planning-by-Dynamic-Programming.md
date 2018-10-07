@@ -2,7 +2,6 @@
 title: 基于模型的动态规划 Planning by Dynamic Programming
 mathjax: true
 date: 2018-05-19
-updated: 2018-05-19
 categories:
 - Reinforcement Learning
 - Course by David Silver
@@ -32,7 +31,9 @@ tags:
 
 <!--more-->
 
-# 迭代法策略评估 Iterative Policy Evaluation
+# 策略迭代 Policy Iteration
+
+## 策略评估 Policy Evaluation
 
 在某个策略 $\pi$ 下，通过贝尔曼公式，一步步迭代便能评估出这个策略的价值函数 $v_\pi$ ：
 
@@ -46,9 +47,9 @@ $$
 $$
 
 
-# 策略迭代 Policy Iteration
+## 策略更新 Policy Improvement
 
-上一章的策略评估只是预测出了某一个策略下的价值函数，评估以后我们还需要用评估的结果来改进策略。所以策略迭代做了两件事：给定一个策略 $\pi$
+上一节的策略评估只是预测出了某一个策略下的价值函数，评估以后我们还需要用评估的结果来改进策略。所以策略迭代 (policy iteration) 做了两件事：给定一个策略 $\pi$
 
 1. 评估策略 $v_\pi(s) = \mathbb{E}[R_{t+1}+\gamma R_{t+2} + \cdots|S_t=s]$
 2. 用贪婪法改进策略 $\pi' = \text{greedy}(v_\pi)$
@@ -58,6 +59,16 @@ $$
 ![](https://s1.ax1x.com/2018/05/19/CcqLHf.png)
 
 图中可以看出给定一个策略，箭头往上表示策略评估，评估完毕箭头往下表示策略改进，直至收敛。
+
+那么如何用贪婪法来改进策略呢？假设现在考虑确定性策略 $a=\pi(s)$ ，我们可以贪婪地更新策略：
+$$
+\pi'(s)=\arg\max_{a\in\mathcal{A}} q_\pi(s,a)
+$$
+可以证明这种策略改进的方法确实是朝更好的方向进行的。如果这种更新停止了，那么也就表示满足了贝尔曼最优方程：
+$$
+q_\pi(s,\pi'(s)) = \max_{a\in\mathcal{A}}q_\pi(s,a)=q_\pi(s,\pi(s)) = v_\pi(s)
+$$
+即对于所有的 $s\in\mathcal{S}$ 都有 $v_\pi(s) = v_*(s)$ ，$\pi$ 也就是最优策略。
 
 # 价值迭代 Value Iteration
 
@@ -71,9 +82,9 @@ $$
 1. 从状态 $s$ 可以到达任意状态 $s'$
 2. 该策略能够使得状态 $s'$ 的价值是最优价值：
 
-以上就是优化原则 (Principle of Optimality) ，如果我们能够知道最优子问题的解 $v_*(s')$ ，就可以根据贝尔曼最优方程直接求解最优价值函数，一步到位：
+以上就是优化原则 (Principle of Optimality) ，如果我们能够知道最优子问题的解 $v_*(s')​$ ，就可以根据贝尔曼最优方程直接求解最优价值函数，一步到位：
 $$
-v_*(s) \leftarrow \max_{a\in\mathcal{A}} \mathcal{R}_s^a + \gamma \sum_{s'\in \mathcal{S}}{\mathcal{P}_{ss'}^a v_*(s')}
+v_*(s) \leftarrow \max_{a\in\mathcal{A}} \bigg(\mathcal{R}_s^a + \gamma \sum_{s'\in \mathcal{S}}{\mathcal{P}_{ss'}^a v_*(s')}\bigg)
 $$
 
 
