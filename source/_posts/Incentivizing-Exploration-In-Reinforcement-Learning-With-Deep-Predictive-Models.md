@@ -5,7 +5,9 @@ title: >-
 mathjax: true
 date: 2018-09-28 09:16:24
 categories: Reinforcement Learning
-tags: RL
+tags:
+- RL
+- XX
 ---
 
 论文 *Incentivizing Exploration In Reinforcement Learning With Deep Predictive Models* 提出了一种基于模型的，为 Reward Function 增加 Bonus 的方法来刺激 agent 进行探索。
