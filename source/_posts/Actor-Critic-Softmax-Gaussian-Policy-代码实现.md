@@ -112,7 +112,7 @@ class Critic(object):
         return td_error.squeeze()
 ```
 
-##　主函数
+## 主函数
 
 ```python
 env = gym.make('CartPole-v0')
@@ -156,7 +156,7 @@ with tf.Session() as sess:
             s = s_
 ```
 
-# Gussian Policy
+# Gaussian Policy
 
 # Actor
 

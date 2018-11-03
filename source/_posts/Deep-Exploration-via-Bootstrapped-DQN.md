@@ -29,18 +29,18 @@ Thompson sampling:
 >
 > 每次选择臂的方式是：用每个臂现有的 Beta 分布产生一个随机数 b，选择所有臂产生的随机数中最大的那个臂去摇。
 >
-> ```python
-> choice = numpy.argmax(pymc.rbeta(1 + self.wins, 1 + self.trials - self.wins))
-> ```
->
-> 数学形式可以写为：
-> $$
-> \begin{align*}
-> &\theta_1,\cdots,\theta_n \sim \hat{p}(\theta_1,\cdots,\theta_n) \\
-> &a=\arg\max_a E_{\theta_a}[r(a)]
-> \end{align*}
-> $$
->
+
+```python
+choice = numpy.argmax(pymc.rbeta(1 + self.wins, 1 + self.trials - self.wins))
+```
+
+数学形式可以写为：
+$$
+\begin{align*}
+&\theta_1,\cdots,\theta_n \sim \hat{p}(\theta_1,\cdots,\theta_n) \\
+&a=\arg\max_a E_{\theta_a}[r(a)]
+\end{align*}
+$$
 
 类比于 MDP 中的 $Q$ 函数：
 
