@@ -48,7 +48,7 @@ $$
 
 作者经过实验，模型对于原始状态的预测效果不好，为了解决这个问题，作者根据论文 *Reducing the dimensionality of data with neural networks* 引入了 $\sigma$ 函数来对原始状态进行重新编码，获得一个低维度的状态表示量。神经网络架构为：
 
-![img](https://s1.ax1x.com/2018/09/28/iQUCBd.md.png)
+![](https://s1.ax1x.com/2018/09/28/iQUCBd.md.png)
 
 输入为原始状态，隐藏层的最后一层大小与原始状态大小相同，输出为一个欧氏距离误差层，尽可能减少最后的状态特征与原始输入的差异。红色圈圈出来的即为降低了维度的 $\sigma(s)$ 。
 
@@ -56,5 +56,5 @@ $$
 
 模型网络的构建很简单，输入为重新编码过的状态与行为对 $(\sigma(s),a)$ 输出为下一时刻预测的编码状态。
 
-![img](https://s1.ax1x.com/2018/09/28/iQUA4P.png)
+![](https://s1.ax1x.com/2018/09/28/iQUA4P.png)
 

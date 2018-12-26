@@ -8,6 +8,7 @@ categories:
 - Reinforcement Learning
 tags:
 - RL
+- Multi-Agent
 ---
 
 在 *Learning to Communicate to Solve Riddles with Deep Distributed Recurrent Q-Networks* 论文中，作者提出了一种 *deep distributed recurrent Q-networks* (DDRQN) 方法，它可以解决多个智能体互相之间的交流协作问题，使智能体之间从无到有达成一种交流协议。论文主要针对两个著名的谜题：囚犯帽子谜题 (Hats Riddle) 与 囚犯开关谜题 (Switch Riddle) 来设计解决方案。

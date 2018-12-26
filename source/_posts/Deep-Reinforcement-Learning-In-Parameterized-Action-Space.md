@@ -6,6 +6,8 @@ categories:
 - Reinforcement Learning
 tags:
 - RL
+- XX
+- Transfer Learning
 ---
 
 论文 Deep Reinforcement Learning In Parameterized Action Space 将 [Deep Deterministic Policy Gradient](https://bluefisher.github.io/2018/05/16/Deep-Deterministic-Policy-Gradient/) 算法扩展了一下，使 DDPG 可以处理连续的参数化的行为空间 (parameterized action space) 。论文以机器人世界杯 (RoboCup) 的 2D 游戏 Half-Field-Offense (HFO) 为例，构造了深度神经网络并进行训练。
@@ -18,7 +20,7 @@ tags:
 
 ## 状态空间
 
-![img](https://s1.ax1x.com/2018/07/18/P1GPS0.png) 
+![](https://s1.ax1x.com/2018/07/18/P1GPS0.png) 
 
 如图所示，我们的 agent 就是这足球上的球员，有着 58 个连续的特征值来表示状态空间，比如该 agent 距球的距离、角球区的距离、禁区角的距离，或者当前的比分，其他球员的信息等等。
 
@@ -53,7 +55,7 @@ $$
 
 ## 神经网络架构
 
-![img](https://s1.ax1x.com/2018/07/18/P1YlZD.png) 
+![](https://s1.ax1x.com/2018/07/18/P1YlZD.png) 
 
 如图，我们用 DDPG 的 actor-critic 形式，其中 actor 与 critic 的隐藏层架构相同。actor 网络的输入为状态向量，输出为行为向量，以前四个为离散的行为 $(Dash,Trun,Tackle,Kick)$ ，后六个为每个行为对应的参数 $(p_1^{dash},p_2^{dash},p_3^{turn},p_4^{tackle},p_5^{kick},p_6^{kick})$ 组成。critic 的输入为状态向量与 actor 所输出的行为向量结合而成的向量，输出则为状态行为价值函数。
 
@@ -68,7 +70,7 @@ $$
 
 通过下图也能直观的看出更新 critic 与 actor 所需要的梯度。
 
-![img](https://s1.ax1x.com/2018/07/18/P10J76.png) 
+![](https://s1.ax1x.com/2018/07/18/P10J76.png) 
 
 为了使算法更加稳定，同样用了 DDPG 中的两个技巧：设置 target 网络与经验回放机制。
 

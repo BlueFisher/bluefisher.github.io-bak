@@ -3,8 +3,10 @@ title: Deep Deterministic Policy Gradient
 mathjax: true
 date: 2018-05-16 19:42:28
 updated: 2018-05-16 19:42:28
-categories:
+categories: Reinforcement Learning
 tags:
+- RL
+- PG
 ---
 
 Deep Deterministic Policy Gradient (DDPG) 算法出自论文 *Continuous control with deep reinforcement learning* ，该算法的思想很简单，就是将 [确定性策略梯度 Deterministic Policy Gradient](https://bluefisher.github.io/2018/05/16/%E7%A1%AE%E5%AE%9A%E6%80%A7%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6-Deterministic-Policy-Gradient/) 与 [Deep Q-Network](https://bluefisher.github.io/2018/05/07/Deep-Q-Network/) 两个算法结合起来，解决了 DQN 只能运用在离散行为空间上的局限，同时借鉴 DQN 的神经网络、经验回放和设置 target 网络使  DPG 中的 Actor-Critic 算法更容易收敛

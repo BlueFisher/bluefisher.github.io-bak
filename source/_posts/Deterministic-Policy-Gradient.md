@@ -117,7 +117,7 @@ $$
 \begin{align*}
 \delta_t &= r_t + \gamma Q^w(s_{t+1},a_{t+1}) - Q^w(s_t,a_t) \tag{11} \\
 w_{t+1} &= w_t + \alpha_w \delta_w \nabla_w Q^w(s_t,a_t) \\
-\theta_{t+1} &= \theta_t + \alpha_\theta  \nabla_θ \mu_\theta(s) \nabla_a Q^{\mu} (s,a)|_{a=\mu_\theta(s)}
+\theta_{t+1} &= \theta_t + \alpha_\theta  \nabla_θ \mu_\theta(s) \nabla_a Q^w (s,a)|_{a=\mu_\theta(s)}
  \end{align*}
 $$
 
@@ -132,7 +132,7 @@ $$
 \begin{align*}
 \delta_t &= r_t + \gamma Q^w(s_{t+1},\mu_\theta(s_{t+1})) - Q^w(s_t,a_t) \tag{16} \\
 w_{t+1} &= w_t + \alpha_w \delta_w \nabla_w Q^w(s_t,a_t) \\
-\theta_{t+1} &= \theta_t + \alpha_\theta  \nabla_θ \mu_\theta(s) \nabla_a Q^{\mu} (s,a)|_{a=\mu_\theta(s)}
+\theta_{t+1} &= \theta_t + \alpha_\theta  \nabla_θ \mu_\theta(s) \nabla_a Q^w (s,a)|_{a=\mu_\theta(s)}
  \end{align*}
 $$
 可以看出同策略与异策略的不同之处在于对 $a_t$ 行为的生成，同策略用的是确定性策略，而异策略则是一个任意的随机策略。对于论文中公式11与公式16处，$a_{t+1}$ 行为的生成方式是相同的，尽管写的不同，都是用确定性策略来生成，这也是我在读论文式比较困惑的一点，还好在 StackExchange 上提问有大神回答了 [链接](https://ai.stackexchange.com/questions/6317/what-is-the-difference-between-onoff-policy-deterministic-actor-critic) 。

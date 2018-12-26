@@ -6,7 +6,7 @@ categories:
 - Reinforcement Learning
 tags:
 - RL
-- transfer learning
+- Transfer Learning
 ---
 
 本文简单介绍两篇论文：*[Progressive Neural Networks](https://arxiv.org/pdf/1606.04671)* 和 *[PathNet: Evolution Channels Gradient Descent in Super Neural Networks](https://arxiv.org/pdf/1701.08734)* 。都出自于 Google DeepMind ，主要侧重于修改网络模型来解决针对强化学习中的迁移学习问题。
@@ -35,7 +35,28 @@ h_i^{(k)}=f\left( W_i^{(k)}h_{i-1}^{(k)} + U_i^{(k:j)}\sigma(V_i^{(k:j)}\alpha_{
 $$
 其中 $h_{i-1}^{(<k)}=[h_{i-1}^{(1)}\cdots h_{i-1}^{(j)} \cdots h_{i-1}^{(k-1)}]$ 。再将之前的横向网络传入当前多层感知机之前，先乘以一个学习标量，用来调整之前横向层的影响程度。$V_i^{(k:j)}$ 是一个射影矩阵，用来进行降维，使得随着 $k$ 越来越多，但横向连接的参数数量与 $|\Theta^{(1)}|$ 相同，在卷积神经网络中，它可以为 $1 \times 1$ 卷积层。
 
-当然 progressive networks 也有一些而问题，其中最大的问题时随着任务数量的增加，神经网络的参数量会越来越多。
+当然 progressive networks 也有一些而问题，其中最大的问题是随着任务数量的增加，神经网络的参数量会越来越多。
 
 # PathNet
 
+DeepMind 随后提出了 PathNet 网络，一种超大规模的神经网络。相较于上文中的 progressive networks 一个任务增加一列神经网络，PathNet 直接预先构建好一个 $L$ 层的模块化的神经网络，每层有 $M$ 个模块，每个模块本身就是一个神经网络，可以是卷积神经网络或者其他类型的网络结构。
+
+具体的学习过程可以用下图来表示，绿色块表示一个独立的神经网络模块：
+
+![](https://s1.ax1x.com/2018/11/03/i45LJx.png)
+
+一共训练了两个任务，第一个任务为 Pong 第二个为 Alien 。每个任务都连续地训练 80M 时间长度。Box 1 的紫色路径展现了训练开始时的随机初始化，接着使用强化学习算法训练几个回合游戏，同时用锦标赛选择算法来进化网络路径，因此进化与学习同时进行。Box 2 展示了有一点收敛之后的情况，会发现一些路径已经有些重叠。最终收敛的状态如 Box 3 所示，只会经过一条路径，Box 4 展示出接下来的训练中，单条路径会一直保持到训练结束。这时切换到第二个任务，同时 Pong 的路径会被冻结，也就是说 Pong 路径上的神经网络模块参数不会改变。Box 5 用深红色路径表示被冻结的路径，用淡蓝色表示随机初始化的路径。新路径在 Box 8 中进化到收敛的状态，160M 步训练之后，Alien 游戏的最优路径被固定，如 Box 9 所示。
+
+从图中可以看到，当一个模块出现在路径中时就称之为被激活了。作者在实验中发现每一层最多有 3 个或 4 个模块被激活，而最后一层比较特殊，每个任务之间不会进行共享，会被单独训练。
+
+PathNet 可以用在许多迁移学习中，下图展示了在强化学习的 Atari 游戏环境下的网络架构：
+
+![](https://s1.ax1x.com/2018/11/03/i4TAsS.png)
+
+该 PathNet 网络架构用了 4 层，每层包含 $M=10$ 个模块，前三层绿色的都为卷积神经网络，最后一层紫色的为全连接网络，具体配置可以参考论文。在 PathNet 的每一层之间，被激活的红色模块输出会进行累加，再输入到下一层中，图中显示为蓝色的方块。输出层由于不会共享网络参数，所以单独列在最右边，每个 Atari 游戏都独有一个输出层。
+
+# 参考
+
+Rusu, A. A., Rabinowitz, N. C., Desjardins, G., Soyer, H., Kirkpatrick, J., Kavukcuoglu, K., ... & Hadsell, R. (2016). Progressive neural networks. *arXiv preprint arXiv:1606.04671*.
+
+Fernando, C., Banarse, D., Blundell, C., Zwols, Y., Ha, D., Rusu, A. A., ... & Wierstra, D. (2017). Pathnet: Evolution channels gradient descent in super neural networks. *arXiv preprint arXiv:1701.08734*.

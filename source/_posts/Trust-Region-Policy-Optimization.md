@@ -7,6 +7,7 @@ categories:
 - Reinforcement Learning
 tags:
 - RL
+- PG
 ---
 
 在 *Trust Region Policy Optimization* 论文中，作者提出了一种保证策略迭代优化的过程单调不减地朝更好的方向发展的算法，也就是说每一次策略的改善，都保证改善后的策略比前一个策略要好。在理论的基础上做了一些近似后，得到了能实际运用的算法： Trust Region Policy Optimization (TRPO)
@@ -31,7 +32,7 @@ $$
 $$
 \eta(\tilde{\pi}) = \eta(\pi) + \mathbb{E}_{s_0,a_0,\cdots\sim\tilde{\pi}} \left[ \sum_{t=0}^{\infty} \gamma^t A_\pi(s_t,a_t) \right] \tag{1}
 $$
-可以看出 $ \mathbb{E}_{s_0,a_0,\cdots\sim\tilde{\pi}}[\cdots]$ 表示了行为的选取符合 $a_t \sim \tilde{\pi}(\cdot |s_t)$ 
+可以看出 $\mathbb{E}_{s_0,a_0,\cdots\sim\tilde{\pi}}[\cdots]$ 表示了行为的选取符合 $a_t \sim \tilde{\pi}(\cdot |s_t)$ 
 
 定义 $\rho_\pi$ 为衰减过后的状态概率分布：
 $$
@@ -69,13 +70,13 @@ $$
 & \text{and } \epsilon=\max_{s,a}|A_\pi(s,a)|
 \end{align*} \tag{3}
 $$
-以下的 算法1 根据上述 公式 (9) 所表示的策略更新的下界，描述了近似的策略迭代方法：
+以下的 算法1 根据上述 公式 (3) 所表示的策略更新的下界，描述了近似的策略迭代方法：
 
 ![](https://s1.ax1x.com/2018/06/30/PFfnFs.png)
 
-公式 (9) 可以保证 算法 1 的策略更新是单调的，也就是说更新的策略序列 $\eta(\pi_0) \le \eta(\pi_1) \le \eta(\pi_2) \le \cdots$ 
+公式 (3) 可以保证 算法 1 的策略更新是单调的，也就是说更新的策略序列 $\eta(\pi_0) \le \eta(\pi_1) \le \eta(\pi_2) \le \cdots$ 
 
-证明：令 $M_i(\pi) = L_{\pi_i}(\pi) - CD_{KL}^{\max} (\pi_i,\pi)$ ，根据 公式 (9) 可得 $\eta(\pi_{i+1}) \ge M_i(\pi_{i+1})$ ，由于 $D_{KL}(\pi_i \ \| \ \pi_i) =0$ ，所以 $\eta(\pi_i) = M_i(\pi_i) = L_{\pi_i}(\pi_i)$ ，两式合并一下得到：
+证明：令 $M_i(\pi) = L_{\pi_i}(\pi) - CD_{KL}^{\max} (\pi_i,\pi)$ ，根据 公式 (3) 可得 $\eta(\pi_{i+1}) \ge M_i(\pi_{i+1})$ ，由于 $D_{KL}(\pi_i \ \| \ \pi_i) =0$ ，所以 $\eta(\pi_i) = M_i(\pi_i) = L_{\pi_i}(\pi_i)$ ，两式合并一下得到：
 $$
 \eta(\pi_{i+1}) - \eta(\pi_i) \ge M_i(\pi_{i+1}) - M_i(\pi_i)
 $$

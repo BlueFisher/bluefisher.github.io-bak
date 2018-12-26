@@ -4,7 +4,9 @@ mathjax: true
 date: 2018-07-03 20:41:55
 updated: 2018-07-03 20:41:55
 categories: Reinforcement Learning
-tags: RL
+tags: 
+- RL
+- PG
 ---
 
 OpenAI 在 *Trust Region Policy Optimization* 的基础上发表了 *Proximal Policy Optimization Algorithms* 论文，提出了一种新颖的目标函数 (surrogate objective function) ，通过用随机梯度下降的方法来优化这个函数达到优化策略的目的，称之为 Proximal Policy Optimization (PPO) 。它有着一些 TRPO 的优点但是比 TRPO 实现起来更加简单。

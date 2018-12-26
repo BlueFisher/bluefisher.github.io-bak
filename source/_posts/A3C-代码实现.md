@@ -7,6 +7,7 @@ categories:
 - Reinforcement Learning
 tags:
 - RL
+- PG
 - python
 ---
 

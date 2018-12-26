@@ -6,6 +6,7 @@ categories:
 - Reinforcement Learning
 tags:
 - RL
+- PG
 ---
 
 本文简单介绍一下 *High-Dimensional Continuous Control Using Generalized Advantage Estimation* 这篇论文。该论文主要做了两件事：
