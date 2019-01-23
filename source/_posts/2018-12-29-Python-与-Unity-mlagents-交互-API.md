@@ -2,14 +2,13 @@
 title: Python 与 Unity mlagents 交互 API
 mathjax: false
 date: 2018-12-29 21:07:54
-categories:
-tags:
+categories: Python
+tags: python
 ---
 
 本文基于 [ml-agents](https://github.com/Unity-Technologies/ml-agents) 中与 python 交互的文档  *[Unity ML-Agents Python Interface and Trainers](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Python-API.md)* ，更加详细地介绍整个交互 API
 
 <!--more-->
-
 
 # 初始化 unity 环境
 
@@ -18,6 +17,8 @@ tags:
 import numpy as np
 import matplotlib.pyplot as plt
 from mlagents.envs import UnityEnvironment
+
+%matplotlib inline
 ```
 
 初始化环境
@@ -58,7 +59,7 @@ env = UnityEnvironment()
             Vector Action space type: continuous
             Vector Action space size (per agent): [2]
             Vector Action descriptions: 3, 3
-    
+
 
 # 获取基础 brain 信息
 
@@ -123,13 +124,13 @@ for name in env.brain_names:
     vector_action_space_size: [2]
     vector_action_descriptions: ['3', '3']
     ---------
-    
+
 
 # 重置训练环境，开始交互
 
-`train_mode=True` 表示是训练模式，即用的是 *Acadmey* 中的 *Training Configuration*
+`train_mode=True` 表示是训练模式，即用的是 *Acadmey* 中的 *Training Configuration* ， `train_mode=False` 为推断模式，即用的是 *Acadmey* 中的 *Inference Configuration* ，unity 中会将每帧都绘制
 
-`train_mode=False` 为推断模式，即用的是 *Acadmey* 中的 *Inference Configuration* ，unity 中会将每帧都绘制
+`config={}` 是 reset 环境时的参数，类型为 `dict` 。需要预先在 unity editor 中定义所有的参数。
 
 返回为一个 `dict` ，包含所有 `brain` 的信息
 
@@ -153,14 +154,16 @@ for name in env.brain_names:
     for i, obs_per_camera in enumerate(info.visual_observations):
         print('\t', obs_per_camera.shape)
         for j, ob in enumerate(obs_per_camera):
-            plt.imsave(f'{i}_{j}.png', ob)
+#             plt.imsave(f'{i}_{j}.png', ob)
+            plt.imshow(ob)
+            plt.show()
     print('text_observations: ', end='')  # 文字状态 list
     print(info.text_observations)
     print('rewards: ', end='')  # 奖励 list
     print(info.rewards)
     print('local_done: ', end='')  # 智能体回合是否结束 list
     print(info.local_done)
-    print('max_reached: ', end='')  # 智能体回合是否到达最大步数 list
+    print('max_reached: ', end='')  # 智能体回合是否到达最大步数（如果达到最大步数，无论智能体回合是否结束，local_done 也为 True） list
     print(info.max_reached)
     print('previous_vector_actions: ', end='')  # 上一个向量行为 numpy
     print(info.previous_vector_actions.shape)
@@ -169,19 +172,19 @@ for name in env.brain_names:
     print('---------')
 ```
 
-    <mlagents.envs.brain.BrainInfo object at 0x000001DB1BEBE198>
+    <mlagents.envs.brain.BrainInfo object at 0x00000261888CBC18>
     vector_observations: (2, 8)
     visual_observations: 
-    	 (2, 84, 94, 3)
-    	 (2, 74, 84, 3)
+    	 (2, 450, 500, 3)
+    	 (2, 550, 600, 3)
     text_observations: ['', '']
     rewards: [0.0, 0.0]
     local_done: [False, False]
     max_reached: [False, False]
     previous_vector_actions: (2, 2)
-    agents: [12224, 12246]
+    agents: [17528, 17550]
     ---------
-    <mlagents.envs.brain.BrainInfo object at 0x000001DB1BEBEF98>
+    <mlagents.envs.brain.BrainInfo object at 0x000002618915A860>
     vector_observations: (1, 8)
     visual_observations: 
     text_observations: ['']
@@ -189,9 +192,9 @@ for name in env.brain_names:
     local_done: [False]
     max_reached: [False]
     previous_vector_actions: (1, 2)
-    agents: [12168]
+    agents: [17472]
     ---------
-    
+
 
 ## 一个最简单的交互方式
 
@@ -216,23 +219,28 @@ def simulate(brain_info):
     rewards_sum = [0] * len(brain_info.agents)
     states = brain_info.vector_observations
 
-    while False in dones and steps_n < MAX_STEPS:
+    while False in dones and not env.global_done:
         actions = ppo.choose_action(states)
         brain_info = env.step({
             default_brain_name: actions
         })[default_brain_name]
         rewards = brain_info.rewards
         local_dones = brain_info.local_done
+        max_reached = brain_info.max_reached
         states_ = brain_info.vector_observations
 
         for i in range(len(brain_info.agents)):
-            trans_all[i].append([states[i], actions[i], np.array([rewards[i]]), local_dones[i]])
+            trans_all[i].append([states[i],
+                                 actions[i],
+                                 np.array([rewards[i]]),
+                                 local_dones[i],
+                                 max_reached[i]])
 
             if not dones[i]:
                 rewards_sum[i] += rewards[i]
 
             dones[i] = dones[i] or local_dones[i]
-        
+
         steps_n += 1
         states = states_
 
@@ -241,6 +249,8 @@ def simulate(brain_info):
 
 brain_info = env.reset(train_mode=False)[default_brain_name]
 for iteration in range(ITER_MAX):
+    if env.global_done:
+        brain_info = env.reset(train_mode=train_mode)[default_brain_name]
     brain_info, trans_all, rewards_sum = simulate(brain_info)
     mean_reward = sum(rewards_sum) / len(rewards_sum)
 ```
@@ -263,7 +273,7 @@ print(type(actions['Brain1']), type(actions['Brain2']))
 
     <class 'numpy.ndarray'> <class 'numpy.ndarray'>
     <class 'list'> <class 'list'>
-    
+
 
 # 关闭连接
 

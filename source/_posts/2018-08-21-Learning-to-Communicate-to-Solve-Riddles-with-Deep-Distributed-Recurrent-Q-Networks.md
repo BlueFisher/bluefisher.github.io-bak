@@ -8,7 +8,7 @@ categories:
 - Reinforcement Learning
 tags:
 - RL
-- Multi-Agent
+- MARL
 typora-root-url: ..
 ---
 

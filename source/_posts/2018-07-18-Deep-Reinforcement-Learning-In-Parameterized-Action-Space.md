@@ -6,8 +6,6 @@ categories:
 - Reinforcement Learning
 tags:
 - RL
-- XX
-- Transfer Learning
 typora-root-url: ..
 ---
 
