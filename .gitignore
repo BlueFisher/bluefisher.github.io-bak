@@ -7,3 +7,4 @@ public/
 .deploy*/
 themes/
 /sync.ffs_db
+*.ffs_db
