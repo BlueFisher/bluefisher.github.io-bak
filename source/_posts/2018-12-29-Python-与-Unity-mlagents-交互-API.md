@@ -44,7 +44,7 @@ env = UnityEnvironment()
             Number of Brains: 2
             Number of Training Brains : 2
             Reset Parameters :
-    		
+    		copy -> 1.0
     Unity brain name: Brain1
             Number of Visual Observations (per agent): 2
             Vector Observation space size (per agent): 8
@@ -59,7 +59,7 @@ env = UnityEnvironment()
             Vector Action space type: continuous
             Vector Action space size (per agent): [2]
             Vector Action descriptions: 3, 3
-
+    
 
 # 获取基础 brain 信息
 
@@ -74,6 +74,8 @@ for name in env.brain_names:
     print('brain_name: ', end='')
     print(params.brain_name)
 
+    print('num_stacked_vector_observations: ', end='')  # 向量状态栈大小
+    print(params.num_stacked_vector_observations)
     print('vector_observation_space_size: ', end='')
     print(params.vector_observation_space_size)  # 向量状态空间
 
@@ -92,7 +94,7 @@ for name in env.brain_names:
     print('---------')
 ```
 
-    {'Brain1': <mlagents.envs.brain.BrainParameters object at 0x000001DB1BE8C828>, 'Brain2': <mlagents.envs.brain.BrainParameters object at 0x000001DB1BE8C9E8>}
+    {'Brain1': <mlagents.envs.brain.BrainParameters object at 0x0000023EC4BFB0F0>, 'Brain2': <mlagents.envs.brain.BrainParameters object at 0x0000023EC5327470>}
     ['Brain1', 'Brain2']
     Unity brain name: Brain1
             Number of Visual Observations (per agent): 2
@@ -102,9 +104,10 @@ for name in env.brain_names:
             Vector Action space size (per agent): [2]
             Vector Action descriptions: 3, 3
     brain_name: Brain1
+    num_stacked_vector_observations: 1
     vector_observation_space_size: 8
     number_visual_observations: 2
-    camera_resolutions: [{'height': 84, 'width': 94, 'blackAndWhite': False}, {'height': 74, 'width': 84, 'blackAndWhite': False}]
+    camera_resolutions: [{'height': 450, 'width': 500, 'blackAndWhite': False}, {'height': 550, 'width': 600, 'blackAndWhite': False}]
     vector_action_space_type: continuous
     vector_action_space_size: [2]
     vector_action_descriptions: ['3', '3']
@@ -117,6 +120,7 @@ for name in env.brain_names:
             Vector Action space size (per agent): [2]
             Vector Action descriptions: 3, 3
     brain_name: Brain2
+    num_stacked_vector_observations: 1
     vector_observation_space_size: 8
     number_visual_observations: 0
     camera_resolutions: []
@@ -124,7 +128,7 @@ for name in env.brain_names:
     vector_action_space_size: [2]
     vector_action_descriptions: ['3', '3']
     ---------
-
+    
 
 # 重置训练环境，开始交互
 
@@ -136,10 +140,15 @@ for name in env.brain_names:
 
 
 ```python
-brain_infos = env.reset(train_mode=True)
+brain_infos = env.reset(train_mode=True, config={
+    'copy': 1
+})
 ```
 
-`vector_observations` 是一个 `numpy` ，维度为 `(智能体数量, 状态向量的长度)`
+    INFO:mlagents.envs:Academy reset with parameters: copy -> 1
+    
+
+`vector_observations` 是一个 `numpy` ，维度为 `(智能体数量, 向量状态的长度 * 向量状态栈大小)` ，其中向量状态栈代表有多少状态被储存起来一起作为当前的状态
 
 `visual_observations` 是一个 `list` ，个数为 `Brain` 中设置的摄像机的个数，其中每一个元素为一个四维的 `numpy` ，维度为 `(智能体数量，长，宽，通道数)` 。如每个 `Brain` 要设置左右两台观测的摄像机，则 `list` 长度为 2 ，分别代表左右两个摄像机。第一个元素为所有智能体的左摄像机的图像集合，第二个元素为所有只能提的右摄像机的图像集合。
 
@@ -172,7 +181,7 @@ for name in env.brain_names:
     print('---------')
 ```
 
-    <mlagents.envs.brain.BrainInfo object at 0x00000261888CBC18>
+    <mlagents.envs.brain.BrainInfo object at 0x0000023EC1FFEDD8>
     vector_observations: (2, 8)
     visual_observations: 
     	 (2, 450, 500, 3)
@@ -182,9 +191,9 @@ for name in env.brain_names:
     local_done: [False, False]
     max_reached: [False, False]
     previous_vector_actions: (2, 2)
-    agents: [17528, 17550]
+    agents: [12450, 12472]
     ---------
-    <mlagents.envs.brain.BrainInfo object at 0x000002618915A860>
+    <mlagents.envs.brain.BrainInfo object at 0x0000023EC5328320>
     vector_observations: (1, 8)
     visual_observations: 
     text_observations: ['']
@@ -192,21 +201,26 @@ for name in env.brain_names:
     local_done: [False]
     max_reached: [False]
     previous_vector_actions: (1, 2)
-    agents: [17472]
+    agents: [12394]
     ---------
-
+    
 
 ## 一个最简单的交互方式
 
 
 ```python
-env.reset(train_mode=False)
+env.reset(train_mode=False, config={
+    'copy': 1
+})
 for i in range(200):
     env.step({
         'Brain1': np.random.randn(2, 2),
         'Brain2': np.random.randn(1, 2)
     })
 ```
+
+    INFO:mlagents.envs:Academy reset with parameters: copy -> 1
+    
 
 ## 一个单 brain 的复杂例子（不能直接执行，只是演示）
 
@@ -273,7 +287,7 @@ print(type(actions['Brain1']), type(actions['Brain2']))
 
     <class 'numpy.ndarray'> <class 'numpy.ndarray'>
     <class 'list'> <class 'list'>
-
+    
 
 # 关闭连接
 
