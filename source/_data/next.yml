@@ -206,10 +206,10 @@ github_banner: https://github.com/BlueFisher || Follow me on GitHub
 # Blog rolls
 links_icon: link
 links_title: Links
-links_layout: block
-#links_layout: inline
-#links:
-  #Title: http://example.com/
+#links_layout: block
+links_layout: inline
+links:
+  Keavnn: https://stepneverstop.github.io/
 
 # Sidebar Avatar
 avatar:

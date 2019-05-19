@@ -32,6 +32,14 @@ $$
 
 ## Soft Value Functions and Energy-Based Models
 
+传统的策略一般是单峰策略分布 (unimodal policy distribution)
+
+![](/images/2018-11-13-Reinforcement-Learning-with-Deep-Energy-Based-Policies/figure_3a_unimodal-policy.png)
+
+但根据图上的 Q 值分布，我们更希望采用多峰策略分布 (multimodal policy distribution)。
+
+![](/images/2018-11-13-Reinforcement-Learning-with-Deep-Energy-Based-Policies/figure_3b_multimodal_policy.png)
+
 现在我们使用基于能量 (energy-based) 的策略来表示公式 (1) 中的随机策略 $\pi$ ：
 $$
 \newcommand{\soft}{\text{soft}}
@@ -113,3 +121,5 @@ $$
 # 参考
 
 Haarnoja, T., Tang, H., Abbeel, P., & Levine, S. (2017). Reinforcement learning with deep energy-based policies. *arXiv preprint arXiv:1702.08165*.
+
+https://bair.berkeley.edu/blog/2017/10/06/soft-q-learning/
