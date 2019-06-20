@@ -31,13 +31,13 @@ $$
 \sum_t \E_{(\st,\at)\sim\rho_\pi}\left[{r(\st,\at)}\right]
 $$
 
-我们的目标就是找到一个策略 $\pi​$ 来最大化该目标函数。而最大熵目标函数增加了一项熵，最优策略则增加了在每一状态下最大化熵：
+我们的目标就是找到一个策略 $\pi$ 来最大化该目标函数。而最大熵目标函数增加了一项熵，最优策略则增加了在每一状态下最大化熵：
 $$
 \newcommand{\ent}{\mathcal{H}}
 \pi^* = \arg\max_{\pi} \sum_{t} \E_{(\st, \at) \sim \rho_\pi}\left[{r(\st,\at) + \alpha\ent(\pi(\cdot|\st))}\right]
 $$
 
-其中 $\alpha​$ 就是 temperature parameter ，决定了相对于奖励值来说，熵的重要程度。
+其中 $\alpha$ 就是 temperature parameter ，决定了相对于奖励值来说，熵的重要程度。
 
 # Soft Policy Iteration
 
@@ -53,12 +53,12 @@ $$
 $$
 \begin{align*}
 V(\st) &= \E_{\at\sim\pi}\left[{Q(\st, \at) - \alpha\log\pi(\at|\st)}\right] \\
-&= \E_{\at\sim\pi}\left[{Q(\st, \at) + \alpha\ent(\pi(\cdot|\st))}\right]
+&= \E_{\at\sim\pi}\left[Q(\st, \at)\right] + \alpha\ent(\pi(\cdot|\st))
 \end{align*} \tag{2}
 $$
 为 soft state value function。可以导出以下soft policy evaluation 定理，即 Q function 一定会收敛：
 
-> Consider the soft Bellman backup operator $\mathcal{T}^\pi​$ in (1) and a mapping $Q^0: \mathcal{S} \times \mathcal{A}\rightarrow \mathbb{R}​$ with $|\mathcal{A}|<\infty​$, and define $Q^{k+1} = \mathcal{T}^\pi Q^k​$. Then the sequence $Q^k​$ will converge to the soft Q-function of $\pi​$ as $k\rightarrow \infty​$.
+> Consider the soft Bellman backup operator $\mathcal{T}^\pi$ in (1) and a mapping $Q^0: \mathcal{S} \times \mathcal{A}\rightarrow \mathbb{R}$ with $|\mathcal{A}|<\infty$, and define $Q^{k+1} = \mathcal{T}^\pi Q^k$. Then the sequence $Q^k$ will converge to the soft Q-function of $\pi$ as $k\rightarrow \infty$.
 
 ## Soft Policy Improvement
 
@@ -76,7 +76,7 @@ $$
 
 # Soft Actor-Critic
 
-上节是在表格形式下的理论推导，在实际操作过程中肯定还是需要对 soft Q-function 和 policy 进行值函数近似。我们用参数化的形式将 Q-function 定义为 $Q_\theta(\st,\at)​$ ，policy 为 $\pi_\phi(\at|\st)​$ ，Q-function 可以为一个神经网络结构，policy 可以为由神经网络输出的均值与协方差矩阵。
+上节是在表格形式下的理论推导，在实际操作过程中肯定还是需要对 soft Q-function 和 policy 进行值函数近似。我们用参数化的形式将 Q-function 定义为 $Q_\theta(\st,\at)$ ，policy 为 $\pi_\phi(\at|\st)$ ，Q-function 可以为一个神经网络结构，policy 可以为由神经网络输出的均值与协方差矩阵。
 
 soft Q-function 的参数可以通过最小化 soft 贝尔曼方程来求得：
 $$
@@ -122,7 +122,7 @@ $$
 $$
 其中 $\mathcal{H}$ 就是这个最小的期望熵。
 
-因为此时 $t​$ 的策略只会影响到未来的优化目标，所以可以使用动态规划方法，从后往前求解。写成迭代的形式为：
+因为此时 $t$ 的策略只会影响到未来的优化目标，所以可以使用动态规划方法，从后往前求解。写成迭代的形式为：
 $$
 \max_{\pi_0} \left( \E_{}\left[{r(s, a_0)}\right] + \max_{\pi_1} \left( \E_{}\left[{ \ldots }\right] + \max_{\pi_T} \E_{}\left[{r(s_T, a_T)}\right] \right) \right)
 $$
