@@ -15,7 +15,7 @@ tags: RL
 
 DeepMind 开发了一套新的训练环境，DMLab-30，在具有相同的动作空间和图像状态环境中进行各种各样的挑战。 
 
-![DMLab-30](/images/2019-06-14-IMPALA-Scalable-Distributed-Deep-RL-with-Importance-Weighted-Actor-Learner-Architectures/DMLab-30-06.gif)
+![](/images/2019-06-14-IMPALA-Scalable-Distributed-Deep-RL-with-Importance-Weighted-Actor-Learner-Architectures/DMLab-30-06.gif)
 
 而 DeepMind 在 [Impala: Scalable distributed deep-rl with importance weighted actor-learner architectures](https://arxiv.org/abs/1802.01561) 论文中，只用一个智能体在多个任务上进行学习。为了训练智能体在多任务上获得更好的效果，需要大吞吐量并能有效利用每个数据点。 为此，DeepMind 开发了一种新的，高度可扩展的分布式体系结构，称为 Importance Weighted Actor-Learner Architecture，它使用一种称为 V-trace 的 off-policy 校正算法。
 
@@ -87,25 +87,57 @@ $$
 -\nabla_{\omega} \sum_{a} \pi_{\omega}\left(a | x_{s}\right) \log \pi_{\omega}\left(a | x_{s}\right)
 $$
 
-## V-trace 与 Q(λ) , Retrace(λ) 比较
+## V-trace 与 $Q^\pi (λ)$ , Retrace($λ$) 比较
 
-V-trace 是基于 [Safe and efficient off-policy reinforcement learning](http://papers.nips.cc/paper/6538-safe-and-efficient-off-policy-reinf) 一文中的 Retrace(λ) 算法，而 Retrace(λ) 又是基于 [Q(λ) with Off-Policy Corrections](https://link.springer.com/chapter/10.1007/978-3-319-46379-7_21) 中的 Q(λ) 算法，本小节简单整理一下这三个算法的演进路线。
+V-trace 是基于 [Safe and efficient off-policy reinforcement learning](http://papers.nips.cc/paper/6538-safe-and-efficient-off-policy-reinf) 一文中的 Retrace($λ$) 算法，而 Retrace($λ$) 又是基于 [Q($λ$) with Off-Policy Corrections](https://link.springer.com/chapter/10.1007/978-3-319-46379-7_21) 中的 $Q^\pi (λ)$ 算法，本小节简单整理一下这三个算法的演进路线。
 
-给定一个目标策略 $\pi$ ，和一个生成回报的行为策略 $\mu$ ，定义操作 $\mathcal{R}^{\pi, \mu}$ ：估计应该是由策略 $\pi$ 生成的回报，同时使用当前 $Q^\pi$ 的估计 $Q$ 来修正。
+## Q($λ$) with Off-Policy Corrections: $Q^\pi (λ)$
+
+给定一个目标策略 $\pi$ ，和一个生成回报的行为策略 $\mu$ ，定义 *off-policy corrected return operator* 操作 $\mathcal{R}^{\pi, \mu}$ ：估计一种回报，该回报应该是由策略 $\pi$ 生成的，同时使用当前 $Q^\pi$ 的估计 $Q$ 来修正。
 $$
 \left(\mathcal{R}^{\pi, \mu} Q\right)(x, a) \stackrel{\operatorname{def}}{=} r(x, a)+\mathbb{E}_{\mu}\left[\sum_{t \geq 1}^{\top} \gamma^{t}\left(r_{t}+\underbrace{\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)-Q\left(x_{t}, a_{t}\right)}_{\text { off-policy correction }}\right)\right]
 $$
-其中 $\mathbb{E}_{\pi} Q(x, \cdot) \equiv \sum_{a \in \mathcal{A}} \pi(a | x) Q(x, a)$ 。 $\mathcal{R}^{\pi, \mu}$ 提供了常规的累积期望带有衰减的奖励和，但是轨迹中的每个奖励值都会有一个 off-policy 修正，这个修正我们定义为 Q 值的期望与 Q 值的差。 这个时候，$Q^\pi$ 对于任何行为策略 $\mu$ 来说即为 $\mathcal{R}^{\pi, \mu}$ 最终收敛的不动点。
+其中 $\mathbb{E}_{\pi} Q(x, \cdot) \equiv \sum_{a \in \mathcal{A}} \pi(a | x) Q(x, a)$ 。 $\mathcal{R}^{\pi, \mu}$ 提供了常规的累积期望带有衰减的奖励和，但是轨迹中的每个奖励值都会有一个 off-policy 修正，这个修正我们定义为 $Q$ 值的期望与 $Q$ 值的差。 这个时候，$Q^\pi$ 对于任何行为策略 $\mu$ 来说即为 $\mathcal{R}^{\pi, \mu}$ 最终收敛的不动点。
 
 对于 n-step and λ-versions 的 $\mathcal{R}^{\pi, \mu}$ ，定义为：
 $$
 \begin{align*} 
-\mathcal{R}_{\lambda}^{\pi, \mu} Q \stackrel{\mathrm{def}}{=} & A^{\lambda}\left[\mathcal{R}_{n}^{\pi, \mu}\right] \\
+\mathcal{R}_{\lambda}^{\pi, \mu} Q \stackrel{\mathrm{def}}{=} & A^{\lambda}\left[\mathcal{R}_{n}^{\pi, \mu}\right] \tag{2} \\ 
 \left(\mathcal{R}_{n}^{\pi, \mu} Q\right)(x, a) \stackrel{\mathrm{def}}{=} & r(x, a)+\mathbb{E}_{\mu}\left[\sum_{t=1}^{n} \left(\gamma^{t}\left(r_{t}+\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)-Q\left(x_{t}, a_{t}\right)\right) \right)
 + \gamma^{n+1} \mathbb{E}_{\pi} Q\left(x_{n+1} \cdot \cdot\right) \right] 
 \end{align*}
 $$
-其中定义操作 $A^{\lambda}[f(n)] \stackrel{\operatorname{def}}{=}(1-\lambda) \sum_{n \geq 0} \lambda^{n} f(n)$ 即为常规的 TD(λ) 权重累加系数。
+其中定义操作 $A^{\lambda}[f(n)] \stackrel{\operatorname{def}}{=}(1-\lambda) \sum_{n \geq 0} \lambda^{n} f(n)$ 即为常规的 TD($\lambda$) 权重累加系数。
+
+理论上的更新算法很简单：
+$$
+Q_{k+1}=\mathcal{R}_{\lambda}^{\pi_{k}, \mu_{k}} Q_{k}
+$$
+$\left(Q_{k}\right)_{k \in \mathbb{N}}$ 是一系列对于 $Q^{\pi_{k}}$ 的估计，其中 $\pi_k$ 是第 $k$ 个临时的目标策略。
+
+然而在实际操作过程中，我们可以将公式 (2) 改写成：
+$$
+\begin{aligned} 
+\mathcal{R}_{\lambda}^{\pi, \mu} Q(x, a) &=Q(x, a)+\mathbb{E}_{\mu}\left[\sum_{t \geq 0}(\lambda \gamma)^{t} \delta_{t}^{\pi}\right] \\ 
+\delta_{t}^{\pi} &\stackrel{\text { def }}{=} r_{t}+\gamma \mathbb{E}_{\pi} Q\left(x_{t+1}, \cdot\right)-Q\left(x_{t}, a_{t}\right) 
+\end{aligned}
+$$
+其中 $\delta_{t}^{\pi}$ 称为 expected TD-error。离线更新（需要等待一个完整的 episode 结束）的向前视角即为：
+$$
+Q_{k+1}(x, a) \leftarrow Q_{k}(x, a)+\alpha_{k} \sum_{t=0}^{T_{k}}(\gamma \lambda)^{t} \delta_{t}^{\pi_{k}}
+$$
+当然也可以使用在线更新的后向视角形式，这需要用到资格迹，论文中算法 (1) 即为这种更新模式。
+
+论文在 Related Work 中与 SARSA($\lambda$) 做了一下比较， SARSA($\lambda$) 对 $Q$ 的更新为：
+$$
+Q_{s+1}\left(x_{s}, a_{s}\right) \leftarrow Q_{s}\left(x_{s}, a_{s}\right)+\alpha_{s}(\underbrace{A^{\lambda} R_{s}^{(n)}-Q\left(x_{s}, a_{s}\right)}_{\Delta_{s}}) \\
+R_{s}^{(n)}=\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} Q\left(x_{s+n+1}, a_{s+n+1}\right)
+$$
+$\Delta_s$ 为 $t$ 时刻的更新总量，也可以像上文一样重写为 one-step TD-errors 的形式：
+$$
+\begin{aligned} \Delta_{s} &=\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t} \\ \delta_{t} &=r_{t}+\gamma Q\left(x_{t+1}, a_{t+1}\right)-Q\left(x_{t}, a_{t}\right) \end{aligned}
+$$
+该形式的推导过程与 GAE 非常相似。
 
 论文最后比较了一下几个常见的 λ-return 算法，我们只列出比较重要的几个：
 
@@ -117,23 +149,29 @@ $$
 | General Q(λ)<br/>(off-policy)     | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} \mathbb{E}_{\pi} Q\left(x_{s+n+1}, \cdot\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}+\mathbb{E}_{\pi} Q\left(x_{s}, \cdot\right)-Q\left(x_{s}, a_{s}\right)$<br/>$\delta_{t}=r_{t}+\gamma \mathbb{E}_{\pi} Q\left(x_{t+1}, \cdot\right)-\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)$ | $Q^{\mu, \pi}$ |
 | $Q^\pi(λ)$<br/>(on/off-policy)    | $\sum_{t=s}^{s+n} \gamma^{t-s}\left[r_{t}+\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)-Q\left(x_{t}, a_{t}\right)\right]$<br/>$+\gamma^{n+1} \mathbb{E}_{\pi} Q\left(x_{s+n+1}, \cdot\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}$<br/>$\delta_{t}=r_{t}+\gamma \mathbb{E}_{\pi} Q\left(x_{t+1}, \cdot\right)-Q\left(x_{t}, a_{t}\right)$ | $Q^\pi$        |
 
-然而，Q(λ) 算法中的行为策略 $\mu$ 与目标策略 $\pi$ 不能差别太大（最大距离依 λ 而定），也就导致了 Q(λ)  并不“安全”。Retrace(λ) 在 Q(λ) 的基础上进行了改进，有三个有点：
+通过 Expected SARSA(λ) 与 $Q^\pi(λ)$ 的对比可以看出，$Q^\pi(λ)$ 只是多了对即时奖励的修正部分
+
+## Safe and efficient off-policy reinforcement learning: Retrace($λ$) 
+
+然而，$Q^\pi (λ)$ 算法中的行为策略 $\mu$ 与目标策略 $\pi$ 不能差别太大（$\|\pi-\mu\|_{1} \leq \frac{1-\gamma}{\lambda \gamma}$），也就导致了 Q($λ$)  并不“安全”。Retrace($λ$) 在 Q($λ$) 的基础上进行了改进，有三个有点：
 
 1. 低方差
 2. 安全，可以利用从任意的行为策略中生成的轨迹，而不需要去关心它到底有多 off-policyness
 3. 高效，可以高效地利用与目标策略接近的行为策略所产生的轨迹
 
-Retrace(λ) 中一个通用的操作为：
+在论文中，作者总结了一个通用的可以比较各种 return-based off-policy 算法的操作为：
 $$
 \mathcal{R} Q(x, a) :=Q(x, a)+\mathbb{E}_{\mu}\left[\sum_{t \geq 0} \gamma^{t}\left(\prod_{s=1}^{t} c_{s}\right)\left(r_{t}+\gamma \mathbb{E}_{\pi} Q\left(x_{t+1}, \cdot\right)-Q\left(x_{t}, a_{t}\right)\right)\right]
 $$
-对于重要性采样来说，$c_{s}=\frac{\pi\left(a_{s} | x_{s}\right)}{\mu\left(a_{s} | x_{s}\right)}$ ；
+对于重要性采样来说，$c_{s}=\frac{\pi\left(a_{s} | x_{s}\right)}{\mu\left(a_{s} | x_{s}\right)}$ ，但会有非常大（甚至是无限）的方差；
 
-对于 off-policy $Q^\pi(λ)$ ，$c_{s}=\lambda$ ；
+对于 off-policy $Q^\pi(λ)$ ，$c_{s}=\lambda$ ，但必须满足 $\|\pi-\mu\|_{1} \leq \frac{1-\gamma}{\lambda \gamma}$ 否则无法工作；
 
-对于 Retrace(λ) ，$c_{s}=\lambda \min \left(1, \frac{\pi\left(a_{s} | x_{s}\right)}{\mu\left(a_{s} | x_{s}\right)}\right)$ ，它将重要性比率截断至 1 。
+对于 TB($\lambda$) ，$c_s=\lambda \pi(a_s|x_s)$ ，但在当 $\mu$ 与 $\pi$ 比较接近的时候（即比较接近 on-policy 的时候），把 traces 给截断就不是很高效了；
 
-而 V-trace 和 Retrace(λ) 类似，只不过 Retrace(λ) 估计的是 Q 函数，这里估计的是 V 函数，因此叫 V-trace。
+对于 Retrace($λ$) ，$c_{s}=\lambda \min \left(1, \frac{\pi\left(a_{s} | x_{s}\right)}{\mu\left(a_{s} | x_{s}\right)}\right)$ ，它将重要性比率截断至 1 。
+
+而 V-trace 和 Retrace($λ$) 类似，只不过 Retrace($λ$) 估计的是 $Q$ 函数，这里估计的是 $V$ 函数，因此叫 V-trace。
 
 # 参考
 

@@ -10,7 +10,9 @@ tags:
 - python
 ---
 
-在 [Proximal Policy Optimization Algorithms](https://bluefisher.github.io/2018/07/03/Proximal-Policy-Optimization-Algorithms/) 一文的基础上，可以看出来 PPO 比 TRPO 算法实现起来方便得多，相比于 Actor-Critic 算法，最重要的改动在于把目标函数进行了替换 (surrogate objective) ，同时在更新这个替代的目标函数时对它加上了一定更新幅度的限制。在实际的代码实现中，我们根据论文中的说明，将 Actor 和 Critic 合并起来，共用一套神经网络参数，只用一个损失函数来进行优化。直接看[完整代码](https://github.com/BlueFisher/Reinforcement-Learning/tree/master/Proximal_Policy_Optimization)
+在 [Proximal Policy Optimization Algorithms](https://bluefisher.github.io/2018/07/03/Proximal-Policy-Optimization-Algorithms/) 一文的基础上，可以看出来 PPO 比 TRPO 算法实现起来方便得多，相比于 Actor-Critic 算法，最重要的改动在于把目标函数进行了替换 (surrogate objective) ，同时在更新这个替代的目标函数时对它加上了一定更新幅度的限制。在实际的代码实现中，我们根据论文中的说明，将 Actor 和 Critic 合并起来，共用一套神经网络参数，只用一个损失函数来进行优化。直接看[完整代码](https://github.com/BlueFisher/Reinforcement-Learning/tree/master/Proximal_Policy_Optimization)。
+
+在 [https://github.com/BlueFisher/RL-PPO-with-Unity](https://github.com/BlueFisher/RL-PPO-with-Unity) 项目中有更加完善，功能更加强大的 PPO 代码，智能体运行环境基于 Unity ML-Agents Toolkit 。
 
 <!--more-->
 

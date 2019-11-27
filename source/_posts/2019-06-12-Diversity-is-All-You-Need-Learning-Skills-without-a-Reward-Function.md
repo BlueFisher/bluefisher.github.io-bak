@@ -67,7 +67,11 @@ $$
 2. 第二项表明从当前状态推断技能 $z$ 应该是很容易的。
 3. 第三项表明每一个技能应该越随机越好。
 
-由于我们没有办法整合所有的状态与技能来精确计算 $p(z|s)$ ，所以我们用一个需要学习的判别器 $q_{\phi}(z | s)$ 来估计后验。琴声不等式保证了用 $q_{\phi}(z | s)$ 来代替 $p(z|s)$ 有一个目标函数 $\mathcal{F}(\theta)$ 的 ELBO $\mathcal{G}(\theta, \phi)$
+由于我们没有办法整合所有的状态与技能来精确计算 $p(z|s)$ ，所以我们用一个需要学习的判别器 $q_{\phi}(z | s)$ 来估计后验。[The IM Algorithm : A variational approach to Information Maximization](https://www.researchgate.net/profile/Felix_Agakov/publication/221620072_The_IM_Algorithm_A_Variational_Approach_to_Information_Maximization/links/555f18d508ae9963a1156419/The-IM-Algorithm-A-Variational-Approach-to-Information-Maximization.pdf) 中
+$$
+I(\mathbf{x}, \mathbf{y}) \geq \underbrace{H(\mathbf{x})}_{\text { ‘‘entrop’’ }}+\underbrace{\langle\log q(\mathbf{x} | \mathbf{y})\rangle_{p(\mathbf{x}, \mathbf{y})}}_{\text { ‘‘energy’’ }} \stackrel{\mathrm{def}}{=} \tilde{I}(\mathbf{x}, \mathbf{y})
+$$
+证明了 Jensen 不等式保证了用 $q_{\phi}(z | s)$ 来代替 $p(z|s)$ 有一个目标函数 $\mathcal{F}(\theta)$ 的 ELBO $\mathcal{G}(\theta, \phi)$
 $$
 \begin{align*} \mathcal{F}(\theta) &=\mathcal{H}[A | S, Z]-\mathcal{H}[Z | S]+\mathcal{H}[Z] \\ &=\mathcal{H}[A | S, Z]+\mathbb{E}_{z \sim p(z), s \sim \pi(z)}[\log p(z | s)]-\mathbb{E}_{z \sim p(z)}[\log p(z)] \\ & \geq \mathcal{H}[A | S, Z]+\mathbb{E}_{z \sim p(z), s \sim \pi(z)}\left[\log q_{\phi}(z | s)-\log p(z)\right] \triangleq \mathcal{G}(\theta, \phi) \end{align*}
 $$
@@ -91,3 +95,5 @@ $$
 # 参考
 
 Eysenbach, B., Gupta, A., Ibarz, J., & Levine, S. (2018). Diversity is all you need: Learning skills without a reward function. *arXiv preprint arXiv:1802.06070*.
+
+https://stepneverstop.github.io/rl-rough-reading.html#DIAYN

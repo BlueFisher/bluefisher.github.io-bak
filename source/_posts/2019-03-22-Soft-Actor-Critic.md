@@ -15,7 +15,7 @@ tags:
 2. 异策略采样可以更有效地复用历史采集到的数据
 3. 熵的最大化可以让算法更稳定，同时还能鼓励探索，找到多个都是最优的 near-optimal 行为。
 
-最大熵强化学习可以参考 [Reinforcement Learning with Deep Energy-Based Policies](https://bluefisher.github.io/2018/11/13/Reinforcement-Learning-with-Deep-Energy-Based-Policies/) 。*[Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](https://arxiv.org/abs/1801.01290)* 实际上最先提出了 SAC 算法，但本篇论文在此基础上做了一定的修改，尤其是改进了对 temperature hyperparmeter 敏感的问题。
+最大熵强化学习可以参考 [Reinforcement Learning with Deep Energy-Based Policies](https://bluefisher.github.io/2018/11/13/Reinforcement-Learning-with-Deep-Energy-Based-Policies/) 。*[Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](https://arxiv.org/abs/1801.01290)* 实际上最先提出了 SAC 算法，但本篇论文在此基础上做了一定的修改，尤其是改进了对 temperature hyperparmeter 敏感的问题。完整代码可见 [https://github.com/BlueFisher/RL-SAC-with-Unity](https://github.com/BlueFisher/RL-SAC-with-Unity).
 
 <!--more-->
 

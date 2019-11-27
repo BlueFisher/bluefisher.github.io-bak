@@ -49,21 +49,20 @@ $$
 
 仿照 TD(λ) ，我们不仅仅让优势函数往前看一步，而是向前看 $k$ 步，那么我们定义 $\hat{A}_t^{(k)}$ ：
 $$
-\begin{align*}
-\hat{A}_t^{(1)} &:= \delta_t^V \\
-\hat{A}_t^{(2)} &:= \delta_t^V + \gamma\delta_{t+1}^V \\
-\hat{A}_t^{(3)} &:= \delta_t^V + \gamma\delta_{t+1}^V + \gamma^2\delta_{t+2}^V \\
-\vdots\\
-\hat{A}_t^{(k)} &:=\sum_{l=0}^{k-1} \gamma^l \delta_{t+l}^V = -V(s_t) + r_t+\gamma r_{t+1} + \cdots + \gamma^{k-1}r_{t+k-1} + \gamma^k V(s_{t+k})
-\end{align*}
-\newcommand{gae}{\text{GAE}}
+\begin{aligned} 
+\hat{A}_{t}^{(1)} &:=\delta_{t}^{V} \\ 
+\hat{A}_{t}^{(2)} &:=\delta_{t}^{V}+\gamma \delta_{t+1}^{V} \\ 
+\hat{A}_{t}^{(3)} &:=\delta_{t}^{V}+\gamma \delta_{t+1}^{V}+\gamma^{2} \delta_{t+2}^{V}=-V\left(s_{t}\right)+r_{t}+\gamma r_{t+1}+\gamma^{2} r_{t+2}+\gamma^{3} V\left(s_{t+3}\right) \\ 
+\hat{A}_{t}^{(k)} &:=\sum_{l=0}^{k-1} \gamma^{l} \delta_{t+l}^{V}=-V\left(s_{t}\right)+r_{t}+\gamma r_{t+1}+\cdots+\gamma^{k-1} r_{t+k-1}+\gamma^{k} V\left(s_{t+k}\right) \end{aligned}
 $$
 接着我们将这 $k$ 步取平均，得到本文最关键的生成式优势函数估计 (generalized advantage estimator) $\gae(\gamma,\lambda)$ ：
 $$
-\begin{align*}
-\hat{A}_t^{\gae(\gamma,\lambda)} &:= (1-\lambda) \left( \hat{A}_t^{(1)}+\lambda\hat{A}_t^{(2)}+\lambda^2\hat{A}_t^{(3)} + \cdots \right) \\
-&=\sum_{l=0}^\infty (\gamma \lambda)^l \delta_{t+l}^V
-\end{align*}
+\begin{aligned} \hat{A}_{t}^{\mathrm{GAE}(\gamma, \lambda)} &:=(1-\lambda)\left(\hat{A}_{t}^{(1)}+\lambda \hat{A}_{t}^{(2)}+\lambda^{2} \hat{A}_{t}^{(3)}+\ldots\right) \\
+&=(1-\lambda)\left(\delta_{t}^{V}+\lambda\left(\delta_{t}^{V}+\gamma \delta_{t+1}^{V}\right)+\lambda^{2}\left(\delta_{t}^{V}+\gamma \delta_{t+1}^{V}+\gamma^{2} \delta_{t+2}^{V}\right)+\ldots\right) \\
+&=(1-\lambda)\left(\delta_{t}^{V}\left(1+\lambda+\lambda^{2}+\ldots\right)+\gamma \delta_{t+1}^{V}\left(\lambda+\lambda^{2}+\lambda^{2}+\ldots\right)\right.\\
+&\left.\quad+\gamma \delta_{t+2}^{V}\left(\lambda^{2}+\lambda^{3}+\lambda^{4}+\ldots\right)+\ldots\right) \\
+&=(1-\lambda)\left(\delta_{t}^{V}\left(\frac{1}{1-\lambda}\right)+\gamma \delta_{t+1}^{V}\left(\frac{\lambda}{1-\lambda}\right)+\gamma^{2} \delta_{t+2}^{V}\left(\frac{\lambda^{2}}{1-\lambda}\right)+\ldots\right) \\
+&=\sum_{l=0}^{\infty}(\gamma \lambda)^{l} \delta_{t+l}^{V} \end{aligned}
 $$
 可以发现，当 $\lambda=0$ 时，$\hat{A}_t:=\delta_t$ ，此时会引入偏差；当 $\lambda=1$ 时，$\hat{A}_t:=\sum_{l=0}^\infty\gamma^l r_{t+l}-V(s_t)$ ，此时会产生很高的方差，所以为了做到偏差方差平衡，$0<\lambda<1$ 很关键。在实验中，作者发现 $\lambda$ 其实比 $\gamma$ 引入的偏差要小得多。
 
