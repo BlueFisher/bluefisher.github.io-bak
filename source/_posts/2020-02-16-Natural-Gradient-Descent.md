@@ -3,8 +3,8 @@ title: Natural Gradient Descent
 mathjax: true
 typora-root-url: ..
 date: 2020-02-16 20:08:26
-categories:
-tags:
+categories: Machine Learning
+tags: ml
 ---
 
 本文翻译自 [Natural Gradient Descent](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/), [Agustinus Kristiadi](https://wiseodd.github.io/).

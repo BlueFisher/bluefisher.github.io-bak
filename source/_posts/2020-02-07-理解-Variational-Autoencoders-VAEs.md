@@ -4,7 +4,9 @@ mathjax: true
 typora-root-url: ..
 date: 2020-02-07 17:17:15
 categories: Machine Learning
-tags: ml
+tags: 
+- ml
+- vae
 ---
 
 本文翻译自 [Understanding Variational Autoencoders (VAEs)](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73), [Joseph Rocca](https://towardsdatascience.com/@joseph.rocca?source=post_page-----f70510919f73----------------------), Sep 24, 2019
