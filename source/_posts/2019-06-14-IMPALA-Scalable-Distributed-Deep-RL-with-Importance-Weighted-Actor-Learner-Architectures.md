@@ -87,19 +87,20 @@ $$
 -\nabla_{\omega} \sum_{a} \pi_{\omega}\left(a | x_{s}\right) \log \pi_{\omega}\left(a | x_{s}\right)
 $$
 
-## V-trace 与 $Q^\pi (λ)$ , Retrace($λ$) 比较
+## V-trace 与 $Q^\pi (\lambda)$ , Retrace($\lambda$) 比较
 
-V-trace 是基于 [Safe and efficient off-policy reinforcement learning](http://papers.nips.cc/paper/6538-safe-and-efficient-off-policy-reinf) 一文中的 Retrace($λ$) 算法，而 Retrace($λ$) 又是基于 [Q($λ$) with Off-Policy Corrections](https://link.springer.com/chapter/10.1007/978-3-319-46379-7_21) 中的 $Q^\pi (λ)$ 算法，本小节简单整理一下这三个算法的演进路线。
+V-trace 是基于 [Safe and efficient off-policy reinforcement learning](http://papers.nips.cc/paper/6538-safe-and-efficient-off-policy-reinf) 一文中的 Retrace($\lambda$) 算法，而 Retrace($\lambda$) 又是基于 [Q($\lambda$) with Off-Policy Corrections](https://link.springer.com/chapter/10.1007/978-3-319-46379-7_21) 中的 $Q^\pi (\lambda)$ 算法，本小节简单整理一下这三个算法的演进路线。
 
-## Q($λ$) with Off-Policy Corrections: $Q^\pi (λ)$
+## Q($\lambda$) with Off-Policy Corrections: $Q^\pi (\lambda)$
 
 给定一个目标策略 $\pi$ ，和一个生成回报的行为策略 $\mu$ ，定义 *off-policy corrected return operator* 操作 $\mathcal{R}^{\pi, \mu}$ ：估计一种回报，该回报应该是由策略 $\pi$ 生成的，同时使用当前 $Q^\pi$ 的估计 $Q$ 来修正。
 $$
-\left(\mathcal{R}^{\pi, \mu} Q\right)(x, a) \stackrel{\operatorname{def}}{=} r(x, a)+\mathbb{E}_{\mu}\left[\sum_{t \geq 1}^{\top} \gamma^{t}\left(r_{t}+\underbrace{\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)-Q\left(x_{t}, a_{t}\right)}_{\text { off-policy correction }}\right)\right]
+\left(\mathcal{R}^{\pi, \mu} Q\right)(x, a) \stackrel{\operatorname{def}}{=} r(x, a)+\mathbb{E}_{\mu}\left[\sum_{t \geq 1}^{\top} \gamma^{t}\left(r_{t}+\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)-Q\left(x_{t}, a_{t}\right)\right)\right]
 $$
 其中 $\mathbb{E}_{\pi} Q(x, \cdot) \equiv \sum_{a \in \mathcal{A}} \pi(a | x) Q(x, a)$ 。 $\mathcal{R}^{\pi, \mu}$ 提供了常规的累积期望带有衰减的奖励和，但是轨迹中的每个奖励值都会有一个 off-policy 修正，这个修正我们定义为 $Q$ 值的期望与 $Q$ 值的差。 这个时候，$Q^\pi$ 对于任何行为策略 $\mu$ 来说即为 $\mathcal{R}^{\pi, \mu}$ 最终收敛的不动点。
 
-对于 n-step and λ-versions 的 $\mathcal{R}^{\pi, \mu}$ ，定义为：
+
+对于 n-step and \lambda-versions 的 $\mathcal{R}^{\pi, \mu}$ ，定义为：
 $$
 \begin{align*} 
 \mathcal{R}_{\lambda}^{\pi, \mu} Q \stackrel{\mathrm{def}}{=} & A^{\lambda}\left[\mathcal{R}_{n}^{\pi, \mu}\right] \tag{2} \\ 
@@ -130,7 +131,7 @@ $$
 
 论文在 Related Work 中与 SARSA($\lambda$) 做了一下比较， SARSA($\lambda$) 对 $Q$ 的更新为：
 $$
-Q_{s+1}\left(x_{s}, a_{s}\right) \leftarrow Q_{s}\left(x_{s}, a_{s}\right)+\alpha_{s}(\underbrace{A^{\lambda} R_{s}^{(n)}-Q\left(x_{s}, a_{s}\right)}_{\Delta_{s}}) \\
+Q_{s+1}\left(x_{s}, a_{s}\right) \leftarrow Q_{s}\left(x_{s}, a_{s}\right)+\alpha_{s}(A^{\lambda} R_{s}^{(n)}-Q\left(x_{s}, a_{s}\right)) \\
 R_{s}^{(n)}=\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} Q\left(x_{s+n+1}, a_{s+n+1}\right)
 $$
 $\Delta_s$ 为 $t$ 时刻的更新总量，也可以像上文一样重写为 one-step TD-errors 的形式：
@@ -139,21 +140,21 @@ $$
 $$
 该形式的推导过程与 GAE 非常相似。
 
-论文最后比较了一下几个常见的 λ-return 算法，我们只列出比较重要的几个：
+论文最后比较了一下几个常见的 \lambda-return 算法，我们只列出比较重要的几个：
 
 | 算法                              | n-step 回报                                                  | 更新规则                                                     | 固定点         |
 | --------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | -------------- |
-| TD(λ)<br/>(on-policy)             | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} V\left(x_{s+n+1}\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}$<br/>$\delta_{t}=r_{t}+\gamma V\left(x_{t+1}\right)-V\left(x_{t}\right)$ | $V^{\mu}$      |
-| SARSA(λ)<br/>(on-policy)          | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} Q\left(x_{s+n+1}, a_{s+n+1}\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}$<br/>$\delta_{t}=r_{t}+\gamma Q\left(x_{t+1}, a_{t+1}\right)-Q\left(x_{t}, a_{t}\right)$ | $Q^{\mu}$      |
-| Expected SARSA(λ)<br/>(on-policy) | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} \mathbb{E}_{\mu} Q\left(x_{s+n+1}, \cdot\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}+\mathbb{E}_{\mu} Q\left(x_{s}, \cdot\right)-Q\left(x_{s}, a_{s}\right)$<br/>$\delta_{t}=r_{t}+\gamma \mathbb{E}_{\mu} Q\left(x_{t+1}, \cdot\right)-\mathbb{E}_{\mu} Q\left(x_{t}, \cdot\right)$ | $Q^{\mu}$      |
-| General Q(λ)<br/>(off-policy)     | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} \mathbb{E}_{\pi} Q\left(x_{s+n+1}, \cdot\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}+\mathbb{E}_{\pi} Q\left(x_{s}, \cdot\right)-Q\left(x_{s}, a_{s}\right)$<br/>$\delta_{t}=r_{t}+\gamma \mathbb{E}_{\pi} Q\left(x_{t+1}, \cdot\right)-\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)$ | $Q^{\mu, \pi}$ |
-| $Q^\pi(λ)$<br/>(on/off-policy)    | $\sum_{t=s}^{s+n} \gamma^{t-s}\left[r_{t}+\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)-Q\left(x_{t}, a_{t}\right)\right]$<br/>$+\gamma^{n+1} \mathbb{E}_{\pi} Q\left(x_{s+n+1}, \cdot\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}$<br/>$\delta_{t}=r_{t}+\gamma \mathbb{E}_{\pi} Q\left(x_{t+1}, \cdot\right)-Q\left(x_{t}, a_{t}\right)$ | $Q^\pi$        |
+| TD(\lambda)<br/>(on-policy)             | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} V\left(x_{s+n+1}\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}$<br/>$\delta_{t}=r_{t}+\gamma V\left(x_{t+1}\right)-V\left(x_{t}\right)$ | $V^{\mu}$      |
+| SARSA(\lambda)<br/>(on-policy)          | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} Q\left(x_{s+n+1}, a_{s+n+1}\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}$<br/>$\delta_{t}=r_{t}+\gamma Q\left(x_{t+1}, a_{t+1}\right)-Q\left(x_{t}, a_{t}\right)$ | $Q^{\mu}$      |
+| Expected SARSA(\lambda)<br/>(on-policy) | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} \mathbb{E}_{\mu} Q\left(x_{s+n+1}, \cdot\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}+\mathbb{E}_{\mu} Q\left(x_{s}, \cdot\right)-Q\left(x_{s}, a_{s}\right)$<br/>$\delta_{t}=r_{t}+\gamma \mathbb{E}_{\mu} Q\left(x_{t+1}, \cdot\right)-\mathbb{E}_{\mu} Q\left(x_{t}, \cdot\right)$ | $Q^{\mu}$      |
+| General Q(\lambda)<br/>(off-policy)     | $\sum_{t=s}^{s+n} \gamma^{t-s} r_{t}+\gamma^{n+1} \mathbb{E}_{\pi} Q\left(x_{s+n+1}, \cdot\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}+\mathbb{E}_{\pi} Q\left(x_{s}, \cdot\right)-Q\left(x_{s}, a_{s}\right)$<br/>$\delta_{t}=r_{t}+\gamma \mathbb{E}_{\pi} Q\left(x_{t+1}, \cdot\right)-\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)$ | $Q^{\mu, \pi}$ |
+| $Q^\pi(\lambda)$<br/>(on/off-policy)    | $\sum_{t=s}^{s+n} \gamma^{t-s}\left[r_{t}+\mathbb{E}_{\pi} Q\left(x_{t}, \cdot\right)-Q\left(x_{t}, a_{t}\right)\right]$<br/>$+\gamma^{n+1} \mathbb{E}_{\pi} Q\left(x_{s+n+1}, \cdot\right)$ | $\sum_{t \geq s}(\lambda \gamma)^{t-s} \delta_{t}$<br/>$\delta_{t}=r_{t}+\gamma \mathbb{E}_{\pi} Q\left(x_{t+1}, \cdot\right)-Q\left(x_{t}, a_{t}\right)$ | $Q^\pi$        |
 
-通过 Expected SARSA(λ) 与 $Q^\pi(λ)$ 的对比可以看出，$Q^\pi(λ)$ 只是多了对即时奖励的修正部分
+通过 Expected SARSA(\lambda) 与 $Q^\pi(\lambda)$ 的对比可以看出，$Q^\pi(\lambda)$ 只是多了对即时奖励的修正部分
 
-## Safe and efficient off-policy reinforcement learning: Retrace($λ$) 
+## Safe and efficient off-policy reinforcement learning: Retrace($\lambda$) 
 
-然而，$Q^\pi (λ)$ 算法中的行为策略 $\mu$ 与目标策略 $\pi$ 不能差别太大（$\|\pi-\mu\|_{1} \leq \frac{1-\gamma}{\lambda \gamma}$），也就导致了 Q($λ$)  并不“安全”。Retrace($λ$) 在 Q($λ$) 的基础上进行了改进，有三个有点：
+然而，$Q^\pi (\lambda)$ 算法中的行为策略 $\mu$ 与目标策略 $\pi$ 不能差别太大（$\|\pi-\mu\|_{1} \leq \frac{1-\gamma}{\lambda \gamma}$），也就导致了 Q($\lambda$)  并不“安全”。Retrace($\lambda$) 在 Q($\lambda$) 的基础上进行了改进，有三个有点：
 
 1. 低方差
 2. 安全，可以利用从任意的行为策略中生成的轨迹，而不需要去关心它到底有多 off-policyness
@@ -165,23 +166,22 @@ $$
 $$
 对于重要性采样来说，$c_{s}=\frac{\pi\left(a_{s} | x_{s}\right)}{\mu\left(a_{s} | x_{s}\right)}$ ，但会有非常大（甚至是无限）的方差；
 
-对于 off-policy $Q^\pi(λ)$ ，$c_{s}=\lambda$ ，但必须满足 $\|\pi-\mu\|_{1} \leq \frac{1-\gamma}{\lambda \gamma}$ 否则无法工作；
+对于 off-policy $Q^\pi(\lambda)$ ，$c_{s}=\lambda$ ，但必须满足 $\|\pi-\mu\|_{1} \leq \frac{1-\gamma}{\lambda \gamma}$ 否则无法工作；
 
 对于 TB($\lambda$) ，$c_s=\lambda \pi(a_s|x_s)$ ，但在当 $\mu$ 与 $\pi$ 比较接近的时候（即比较接近 on-policy 的时候），把 traces 给截断就不是很高效了；
 
-对于 Retrace($λ$) ，$c_{s}=\lambda \min \left(1, \frac{\pi\left(a_{s} | x_{s}\right)}{\mu\left(a_{s} | x_{s}\right)}\right)$ ，它将重要性比率截断至 1 。
+对于 Retrace($\lambda$) ，$c_{s}=\lambda \min \left(1, \frac{\pi\left(a_{s} | x_{s}\right)}{\mu\left(a_{s} | x_{s}\right)}\right)$ ，它将重要性比率截断至 1 。
 
-而 V-trace 和 Retrace($λ$) 类似，只不过 Retrace($λ$) 估计的是 $Q$ 函数，这里估计的是 $V$ 函数，因此叫 V-trace。
+而 V-trace 和 Retrace($\lambda$) 类似，只不过 Retrace($\lambda$) 估计的是 $Q$ 函数，这里估计的是 $V$ 函数，因此叫 V-trace。
 
 # 参考
 
 Espeholt, L., Soyer, H., Munos, R., Simonyan, K., Mnih, V., Ward, T., ... & Legg, S. (2018). Impala: Scalable distributed deep-rl with importance weighted actor-learner architectures. *arXiv preprint arXiv:1802.01561*.
 
-Harutyunyan, Anna, Marc G Bellemare, Tom Stepleton, and Remi Munos. “Q(λ) with Oﬀ-Policy Corrections,” n.d., 15.
+Harutyunyan, Anna, Marc G Bellemare, Tom Stepleton, and Remi Munos. “Q(\lambda) with Oﬀ-Policy Corrections,” n.d., 15.
 
 Munos, Remi, Tom Stepleton, Anna Harutyunyan, and Marc Bellemare. “Safe and Efficient Off-Policy Reinforcement Learning,” n.d., 9.
 
 <https://deepmind.com/blog/impala-scalable-distributed-deeprl-dmlab-30/>
 
 <https://zhuanlan.zhihu.com/p/34074929>
-
