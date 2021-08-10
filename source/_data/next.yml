@@ -64,7 +64,7 @@ footer:
     # Change the color of icon, using Hex Code.
     color: "#808080"
 
-  # If not defined, will be used `author` from Hexo main config.
+  # If not defined, `author` from Hexo `_config.yml` will be used.
   copyright:
 
   # Powered by Hexo & NexT
@@ -119,7 +119,7 @@ darkmode: false
 menu:
   home: / || home
   #about: /about/ || user
-  tags: /tags/ ||tags
+  tags: /tags/ || tags
   categories: /categories/ || th
   archives: /archives/ || archive
   #schedule: /schedule/ || calendar
